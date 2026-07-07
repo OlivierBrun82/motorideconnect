@@ -1,9 +1,24 @@
 
 services:
+###> webapp ###
+  php:
+    environment:
+      DATABASE_URL: mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:-!ChangeMe!}@database:3306/${MYSQL_DATABASE:-app}?serverVersion=8.4.0&charset=utf8mb4
+      MAILER_DSN: smtp://mailer:1025
+
+  nginx:
+    ports:
+      - "8080:80"
+
+  phpmyadmin:
+    ports:
+      - "8081:80"
+###< webapp ###
+
 ###> doctrine/doctrine-bundle ###
   database:
     ports:
-      - "5432"
+      - "3306"
 ###< doctrine/doctrine-bundle ###
 
 ###> symfony/mailer ###
