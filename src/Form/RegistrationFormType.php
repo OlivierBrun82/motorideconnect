@@ -3,7 +3,10 @@
 namespace App\Form;
 
 use App\Entity\User;
+use App\Enum\DriverLevel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -18,11 +21,35 @@ class RegistrationFormType extends AbstractType
     {
         $builder
             ->add('email')
+            ->add('pseudo', null, [
+                'constraints' => [
+                    new NotBlank(message: 'Choisis un pseudo'),
+                    new Length(
+                        min: 3,
+                        max: 100,
+                        minMessage: 'Ton pseudo doit faire au moins {{ limit }} caractères',
+                    ),
+                ],
+            ])
+            ->add('birthdate', DateType::class, [
+                'required' => false,
+                'widget' => 'single_text',
+            ])
+            ->add('phoneNumber', null, [
+                'required' => false,
+                'attr' => ['placeholder' => 'votre numéro de téléphone'],
+            ])
+            ->add('driverLvl', EnumType::class, [
+                'class' => DriverLevel::class,
+                'required' => false,
+                'placeholder' => 'Quel est ton niveau de pilotage ?',
+                'choice_label' => fn (DriverLevel $level) => $level->label(),
+            ])
             ->add('agreeTerms', CheckboxType::class, [
                 'mapped' => false,
                 'constraints' => [
                     new IsTrue(
-                        message: 'You should agree to our terms.',
+                        message: 'Vous devez accepter nos conditions générales.',
                     ),
                 ],
             ])
@@ -33,11 +60,11 @@ class RegistrationFormType extends AbstractType
                 'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => [
                     new NotBlank(
-                        message: 'Please enter a password',
+                        message: 'Veuillez entrer un mot de passe',
                     ),
                     new Length(
                         min: 6,
-                        minMessage: 'Your password should be at least {{ limit }} characters',
+                        minMessage: 'Votre mot de passe doit faire au moins {{ limit }} characters',
                         // max length allowed by Symfony for security reasons
                         max: 4096,
                     ),
