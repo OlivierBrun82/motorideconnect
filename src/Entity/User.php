@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Symfony\Component\Validator\Constraints as Assert;
 use App\Enum\DriverLevel;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
@@ -23,6 +24,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotBlank(message: 'L\'email est obligatoire')]
+    #[Assert\Email(message: 'L\'email n\'est pas valide')]
     #[ORM\Column(length: 180)]
     private ?string $email = null;
 
@@ -41,18 +44,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private bool $isVerified = false;
 
+    #[Assert\NotBlank(message: 'Choisis un pseudo')]
+    #[Assert\Length(
+        min: 3,
+        max: 100,
+        minMessage: 'Le pseudo doit contenir au moins {{ limit }} caractères',
+        maxMessage: 'Le pseudo ne peut pas dépasser {{ limit }} caractères',
+    )]
+    #[Assert\Regex(
+        pattern: '/^[a-zA-Z0-9_-]+$/',
+        message: 'Le pseudo ne peut contenir que des lettres, chiffres, - et _',
+    )]
     #[ORM\Column(length: 100, unique: true)]
     private ?string $pseudo = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $avatar = null;
 
+    #[Assert\LessThanOrEqual('today', message: 'La date de naissance ne peut pas être dans le futur')]
+    #[Assert\LessThanOrEqual('-16 years', message: 'Vous devez avoir au moins 16 ans pour vous inscrire')]
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTime $birthdate = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $about = null;
 
+    #[Assert\Regex(
+        pattern: '/^(?:\+33|0)\s?[1-9](\s?\d{2}){4}$/',
+        message: 'Le numéro de téléphone n\'est pas valide, ex : 0612345678 ou +33612345678',
+    )]
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $phoneNumber = null;
 
