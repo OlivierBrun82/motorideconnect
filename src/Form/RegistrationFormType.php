@@ -20,8 +20,11 @@ class RegistrationFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('email')
+            ->add('email', null, [
+                'label' => 'Adresse email',
+            ])
             ->add('pseudo', null, [
+                'label' => 'Pseudo',
                 'constraints' => [
                     new NotBlank(message: 'Choisis un pseudo'),
                     new Length(
@@ -32,20 +35,25 @@ class RegistrationFormType extends AbstractType
                 ],
             ])
             ->add('birthdate', DateType::class, [
+                'label' => 'Date de naissance',
                 'required' => false,
                 'widget' => 'single_text',
             ])
             ->add('phoneNumber', null, [
+                'label' => 'Téléphone',
                 'required' => false,
+                'help' => 'Format : 0612345678 ou +33612345678',
                 'attr' => ['placeholder' => 'votre numéro de téléphone'],
             ])
             ->add('driverLvl', EnumType::class, [
+                'label' => 'Niveau de pilotage',
                 'class' => DriverLevel::class,
                 'required' => false,
                 'placeholder' => 'Quel est ton niveau de pilotage ?',
                 'choice_label' => fn (DriverLevel $level) => $level->label(),
             ])
             ->add('agreeTerms', CheckboxType::class, [
+                'label' => 'J\'accepte les conditions générales',
                 'mapped' => false,
                 'constraints' => [
                     new IsTrue(
@@ -54,6 +62,7 @@ class RegistrationFormType extends AbstractType
                 ],
             ])
             ->add('plainPassword', PasswordType::class, [
+                'label' => 'Mot de passe',
                 // instead of being set onto the object directly,
                 // this is read and encoded in the controller
                 'mapped' => false,
