@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Enum\DriverLevel;
 use App\Repository\UserRepository;
@@ -87,6 +89,52 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    /**
+     * @var Collection<int, Motorcycle>
+     */
+    #[ORM\OneToMany(targetEntity: Motorcycle::class, mappedBy: 'user')]
+    private Collection $motorcycles;
+
+    /**
+     * @var Collection<int, Ride>
+     */
+    #[ORM\OneToMany(targetEntity: Ride::class, mappedBy: 'user')]
+    private Collection $rides;
+
+    /**
+     * @var Collection<int, Strikes>
+     */
+    #[ORM\OneToMany(targetEntity: Strikes::class, mappedBy: 'user')]
+    private Collection $strikes;
+
+    /**
+     * @var Collection<int, Comment>
+     */
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'user')]
+    private Collection $comments;
+
+    /**
+     * @var Collection<int, Ride>
+     */
+    #[ORM\ManyToMany(targetEntity: Ride::class, mappedBy: 'participants')]
+    private Collection $ridesParticipated;
+
+    /**
+     * @var Collection<int, Ride>
+     */
+    #[ORM\ManyToMany(targetEntity: Ride::class, mappedBy: 'likedBy')]
+    private Collection $ridesLiked;
+
+    public function __construct()
+    {
+        $this->motorcycles = new ArrayCollection();
+        $this->rides = new ArrayCollection();
+        $this->strikes = new ArrayCollection();
+        $this->comments = new ArrayCollection();
+        $this->ridesParticipated = new ArrayCollection();
+        $this->ridesLiked = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -286,5 +334,179 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
         return $this->updatedAt;
+    }
+
+    /**
+     * @return Collection<int, Motorcycle>
+     */
+    public function getMotorcycles(): Collection
+    {
+        return $this->motorcycles;
+    }
+
+    public function addMotorcycle(Motorcycle $motorcycle): static
+    {
+        if (!$this->motorcycles->contains($motorcycle)) {
+            $this->motorcycles->add($motorcycle);
+            $motorcycle->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMotorcycle(Motorcycle $motorcycle): static
+    {
+        if ($this->motorcycles->removeElement($motorcycle)) {
+            // set the owning side to null (unless already changed)
+            if ($motorcycle->getUser() === $this) {
+                $motorcycle->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Ride>
+     */
+    public function getRides(): Collection
+    {
+        return $this->rides;
+    }
+
+    public function addRide(Ride $ride): static
+    {
+        if (!$this->rides->contains($ride)) {
+            $this->rides->add($ride);
+            $ride->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRide(Ride $ride): static
+    {
+        if ($this->rides->removeElement($ride)) {
+            // set the owning side to null (unless already changed)
+            if ($ride->getUser() === $this) {
+                $ride->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Strikes>
+     */
+    public function getStrikes(): Collection
+    {
+        return $this->strikes;
+    }
+
+    public function addStrike(Strikes $strike): static
+    {
+        if (!$this->strikes->contains($strike)) {
+            $this->strikes->add($strike);
+            $strike->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStrike(Strikes $strike): static
+    {
+        if ($this->strikes->removeElement($strike)) {
+            // set the owning side to null (unless already changed)
+            if ($strike->getUser() === $this) {
+                $strike->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Comment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): static
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): static
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getUser() === $this) {
+                $comment->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Ride>
+     */
+    public function getRidesParticipated(): Collection
+    {
+        return $this->ridesParticipated;
+    }
+
+    public function addRidesParticipated(Ride $ridesParticipated): static
+    {
+        if (!$this->ridesParticipated->contains($ridesParticipated)) {
+            $this->ridesParticipated->add($ridesParticipated);
+            $ridesParticipated->addParticipant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRidesParticipated(Ride $ridesParticipated): static
+    {
+        if ($this->ridesParticipated->removeElement($ridesParticipated)) {
+            $ridesParticipated->removeParticipant($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Ride>
+     */
+    public function getRidesLiked(): Collection
+    {
+        return $this->ridesLiked;
+    }
+
+    public function addRidesLiked(Ride $ridesLiked): static
+    {
+        if (!$this->ridesLiked->contains($ridesLiked)) {
+            $this->ridesLiked->add($ridesLiked);
+            $ridesLiked->addLikedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRidesLiked(Ride $ridesLiked): static
+    {
+        if ($this->ridesLiked->removeElement($ridesLiked)) {
+            $ridesLiked->removeLikedBy($this);
+        }
+
+        return $this;
     }
 }
