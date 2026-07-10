@@ -6,6 +6,8 @@ use App\Enum\RideRhythm;
 use App\Enum\DriverLevel;
 use App\Enum\RideStatus;
 use App\Repository\RideRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -55,6 +57,44 @@ class Ride
 
     #[ORM\Column(length: 20, enumType: RideStatus::class)]
     private ?RideStatus $statut = null;
+
+    #[ORM\ManyToOne(inversedBy: 'rides')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
+    /**
+     * @var Collection<int, Comment>
+     */
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'ride')]
+    private Collection $comments;
+
+    /**
+     * @var Collection<int, Motorcycle>
+     */
+    #[ORM\ManyToMany(targetEntity: Motorcycle::class, inversedBy: 'rides')]
+    private Collection $motorcycles;
+
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'ridesParticipated')]
+    #[ORM\JoinTable(name: 'ride_participant')]
+    private Collection $participants;
+
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'ridesLiked')]
+    #[ORM\JoinTable(name: 'ride_like')]
+    private Collection $likedBy;
+
+    public function __construct()
+    {
+        $this->comments = new ArrayCollection();
+        $this->motorcycles = new ArrayCollection();
+        $this->participants = new ArrayCollection();
+        $this->likedBy = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -213,6 +253,120 @@ class Ride
     public function setStatut(RideStatus $statut): static
     {
         $this->statut = $statut;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Comment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): static
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setRide($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): static
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getRide() === $this) {
+                $comment->setRide(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Motorcycle>
+     */
+    public function getMotorcycles(): Collection
+    {
+        return $this->motorcycles;
+    }
+
+    public function addMotorcycle(Motorcycle $motorcycle): static
+    {
+        if (!$this->motorcycles->contains($motorcycle)) {
+            $this->motorcycles->add($motorcycle);
+        }
+
+        return $this;
+    }
+
+    public function removeMotorcycle(Motorcycle $motorcycle): static
+    {
+        $this->motorcycles->removeElement($motorcycle);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getParticipants(): Collection
+    {
+        return $this->participants;
+    }
+
+    public function addParticipant(User $participant): static
+    {
+        if (!$this->participants->contains($participant)) {
+            $this->participants->add($participant);
+        }
+
+        return $this;
+    }
+
+    public function removeParticipant(User $participant): static
+    {
+        $this->participants->removeElement($participant);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getLikedBy(): Collection
+    {
+        return $this->likedBy;
+    }
+
+    public function addLikedBy(User $likedBy): static
+    {
+        if (!$this->likedBy->contains($likedBy)) {
+            $this->likedBy->add($likedBy);
+        }
+
+        return $this;
+    }
+
+    public function removeLikedBy(User $likedBy): static
+    {
+        $this->likedBy->removeElement($likedBy);
 
         return $this;
     }
