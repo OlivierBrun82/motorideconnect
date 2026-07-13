@@ -2,7 +2,7 @@
 
 namespace App\Enum;
 
-enum MotorcycleType: string
+enum MotorcycleCategory: string
 {
     case Roadster    = 'roadster';
     case Trail       = 'trail';

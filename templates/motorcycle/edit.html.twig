@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier ma moto{% endblock %}
+
+{% block body %}
+    <h1>Modifier ma moto</h1>
+
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <button type="submit">Enregistrer</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('app_motorcycle') }}">Retour au garage</a>
+{% endblock %}

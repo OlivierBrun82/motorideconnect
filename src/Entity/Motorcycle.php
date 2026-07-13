@@ -2,7 +2,8 @@
 
 namespace App\Entity;
 
-use App\Enum\MotorcycleType;
+use Symfony\Component\Validator\Constraints as Assert;
+use App\Enum\MotorcycleCategory;
 use App\Repository\MotorcycleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -16,12 +17,20 @@ class Motorcycle
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 20, enumType:
-    MotorcycleType::class)]
-    private ?MotorcycleType $type = null;
+    #[ORM\Column(length: 20, enumType: MotorcycleCategory::class)]
+    private ?MotorcycleCategory $type = null;
 
+    #[Assert\NotBlank(message: 'La cylindrée est obligatoire')]
+    #[Assert\GreaterThanOrEqual(
+    value: 125,
+    message: 'La cylindrée doit être d\'au moins {{ compared_value }} cm³',
+    )]    
     #[ORM\Column]
     private ?int $displacement = null;
+
+    #[Assert\PositiveOrZero(
+    message: "L'autonomie ne peut pas être négative",
+    )]
 
     #[ORM\Column(nullable: true)]
     private ?int $autonomy = null;
@@ -52,12 +61,12 @@ class Motorcycle
         return $this->id;
     }
 
-    public function getType(): ?MotorcycleType
+    public function getType(): ?MotorcycleCategory
     {
         return $this->type;
     }
 
-    public function setType(MotorcycleType $type): static
+    public function setType(MotorcycleCategory $type): static
     {
         $this->type = $type;
 
