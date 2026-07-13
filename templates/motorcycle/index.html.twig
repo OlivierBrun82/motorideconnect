@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon garage{% endblock %}
+
+{% block body %}
+    <h1>Mon garage</h1>
+
+    <a href="{{ path('app_motorcycle_new') }}">Ajouter une moto</a>
+
+    <ul>
+        {% for moto in motorcycles %}
+            <li>
+                {{ moto.brand.name }} — {{ moto.type.label }} ({{ moto.displacement }} cm³)
+                <a href="{{ path('app_motorcycle_show', {id: moto.id}) }}">Voir</a>
+                <a href="{{ path('app_motorcycle_edit', {id: moto.id}) }}">Modifier</a>
+            </li>
+            <form method="post" action="{{ path('app_motorcycle_delete', {id: moto.id}) }}"
+                onsubmit="return confirm('Supprimer cette moto ?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ moto.id) }}">
+                <button type="submit">Supprimer</button>
+            </form>
+        {% else %}
+            <li>Tu n'as pas encore de moto.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

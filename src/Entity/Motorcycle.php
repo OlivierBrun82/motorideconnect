@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Symfony\Component\Validator\Constraints as Assert;
 use App\Enum\MotorcycleCategory;
 use App\Repository\MotorcycleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -19,8 +20,17 @@ class Motorcycle
     #[ORM\Column(length: 20, enumType: MotorcycleCategory::class)]
     private ?MotorcycleCategory $type = null;
 
+    #[Assert\NotBlank(message: 'La cylindrée est obligatoire')]
+    #[Assert\GreaterThanOrEqual(
+    value: 125,
+    message: 'La cylindrée doit être d\'au moins {{ compared_value }} cm³',
+    )]    
     #[ORM\Column]
     private ?int $displacement = null;
+
+    #[Assert\PositiveOrZero(
+    message: "L'autonomie ne peut pas être négative",
+    )]
 
     #[ORM\Column(nullable: true)]
     private ?int $autonomy = null;
