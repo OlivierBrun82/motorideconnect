@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Enum\MotorcycleType;
+use App\Enum\MotorcycleCategory;
 use App\Repository\MotorcycleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -16,9 +16,8 @@ class Motorcycle
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 20, enumType:
-    MotorcycleType::class)]
-    private ?MotorcycleType $type = null;
+    #[ORM\Column(length: 20, enumType: MotorcycleCategory::class)]
+    private ?MotorcycleCategory $type = null;
 
     #[ORM\Column]
     private ?int $displacement = null;
@@ -52,12 +51,12 @@ class Motorcycle
         return $this->id;
     }
 
-    public function getType(): ?MotorcycleType
+    public function getType(): ?MotorcycleCategory
     {
         return $this->type;
     }
 
-    public function setType(MotorcycleType $type): static
+    public function setType(MotorcycleCategory $type): static
     {
         $this->type = $type;
 
