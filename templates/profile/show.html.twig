@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil de {{ user.pseudo }}{% endblock %}
+
+{% block body %}
+    <h1>{{ user.pseudo }}</h1>
+
+    {% if user.avatar %}
+        <img src="{{ user.avatar }}" alt="avatar de {{ user.pseudo }}">
+    {% endif %}
+
+    {% if user.about %}
+    <p>{{ user.about }}</p>
+    {% endif %}
+
+    {% if user.driverLvl %}
+    <p>Niveau : {{ user.driverLvl.label }}</p>
+    {% endif %}
+
+    <h2>Motos</h2>
+    <ul>
+        {% for moto in user.motorcycles %}
+            <li>{{ moto.brand.name }} — {{ moto.type.label }} ({{ moto.displacement }} cm³)</li>
+        {% else %}
+            <li>Aucune moto renseignée</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
