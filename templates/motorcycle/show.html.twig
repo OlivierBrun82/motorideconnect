@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ motorcycle.brand ? motorcycle.brand.name : 'Moto' }}{% endblock %}
+
+{% block body %}
+    <h1>{{ motorcycle.type.label }}</h1>
+
+    {% if motorcycle.brand %}
+        <p>Marque : {{ motorcycle.brand.name }}</p>
+    {% endif %}
+
+    <p>Cylindrée : {{ motorcycle.displacement }} cm³</p>
+
+    {% if motorcycle.autonomy %}
+        <p>Autonomie : {{ motorcycle.autonomy }} km</p>
+    {% endif %}
+
+    {% if motorcycle.photo %}
+        <img src="{{ motorcycle.photo }}" alt="photo de la moto">
+    {% endif %}
+
+    <a href="{{ path('app_motorcycle') }}">Retour au garage</a>
+{% endblock %}

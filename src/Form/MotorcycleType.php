@@ -24,10 +24,12 @@ class MotorcycleType extends AbstractType
             ])
             ->add('displacement', null, [
                 'label' => 'Cylindrée (cm³)',
+                'attr' => ['min' => 125],
             ])
             ->add('autonomy', null, [
                 'label' => 'Autonomie (km)',
                 'required' => false,
+                'attr' => ['min' => 0],
             ])
             ->add('brand', EntityType::class, [
                 'label' => 'Marque',
