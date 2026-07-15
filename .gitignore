@@ -17,7 +17,8 @@
 ###> symfony/asset-mapper ###
 /public/assets/
 /assets/vendor/
+/public/uploads
 ###< symfony/asset-mapper ###
 
 # Secrets locaux (ne pas committer)
-/.env
+.env
