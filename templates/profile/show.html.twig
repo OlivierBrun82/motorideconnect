@@ -6,7 +6,7 @@
     <h1>{{ user.pseudo }}</h1>
 
     {% if user.avatar %}
-        <img src="{{ user.avatar }}" alt="avatar de {{ user.pseudo }}">
+        <img src="{{ asset('uploads/avatars/' ~ user.avatar) }}" alt="avatar de {{ user.pseudo }}">
     {% endif %}
 
     {% if user.about %}

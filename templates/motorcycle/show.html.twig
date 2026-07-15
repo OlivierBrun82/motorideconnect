@@ -16,7 +16,7 @@
     {% endif %}
 
     {% if motorcycle.photo %}
-        <img src="{{ motorcycle.photo }}" alt="photo de la moto">
+        <img src="{{ asset('uploads/motorcycles/' ~ motorcycle.photo) }}" alt="photo de la moto">
     {% endif %}
 
     <a href="{{ path('app_motorcycle') }}">Retour au garage</a>
