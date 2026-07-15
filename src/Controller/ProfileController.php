@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\ProfileFormType;
+use App\Service\FileUploader;
 use App\Service\ProfileUpdater;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,7 +17,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class ProfileController extends AbstractController
 {
     #[Route('/', name: 'app_profile')]
-    public function index(Request $request, ProfileUpdater $updater): Response
+    public function index(Request $request, ProfileUpdater $updater, FileUploader $fileUploader): Response
     {
         // Récupère l'utilisateur connecté
         $user = $this->getUser();
@@ -28,7 +29,7 @@ final class ProfileController extends AbstractController
 
         // Le form a été envoyé ET toutes les validations passent
         if ($formUser->isSubmitted() && $formUser->isValid()) {
-
+            
             // Récupère les 2 champs non mappés (gérés à la main)
             $currentPassword = $formUser->get('currentPassword')->getData();
             $newPassword = $formUser->get('plainPassword')->getData();
@@ -38,6 +39,13 @@ final class ProfileController extends AbstractController
                 // Mot de passe actuel incorrect : on n'enregistre pas
                 $this->addFlash('error', 'Le mot de passe actuel est incorrect.');
             } else {
+                // Avatar : si un nouveau fichier est envoyé, on le traite (sinon on garde l'ancien)
+                $avatarFile = $formUser->get('avatarFile')->getData();
+                if ($avatarFile) {
+                    $newFilename = $fileUploader->upload($avatarFile, 'avatars');
+                    $user->setAvatar($newFilename);
+                }
+
                 // Tout est bon : on enregistre en base
                 $updater->updateProfile($user);
                 $this->addFlash('success', 'Profil mis à jour.');
@@ -52,6 +60,7 @@ final class ProfileController extends AbstractController
             'profileForm' => $formUser,
         ]);
     }
+    
     #[Route('/{id}', name:'app_profile_id')]
     public function show(User $user) : Response
     {
