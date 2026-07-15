@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Image;
 
 class MotorcycleType extends AbstractType
 {
@@ -42,6 +43,23 @@ class MotorcycleType extends AbstractType
                 'label' => 'Photo de la moto',
                 'mapped' => false,
                 'required' => false,
+                'attr' => ['accept' => 'image/*'],
+                'constraints' => [
+                    new Image(
+                        maxSize: '10Mi',
+                        maxWidth: 8000,
+                        maxHeight: 8000,
+                        mimeTypes: [
+                            'image/jpeg',
+                            'image/png',
+                            'image/webp',
+                        ],
+                        mimeTypesMessage: 'Formats acceptés : JPEG, PNG, WebP.',
+                        maxSizeMessage: "L'image ne doit pas dépasser {{ limit }} {{ suffix }}.",
+                        maxWidthMessage: 'L\'image est trop grande (max {{ max_width }}px de large).',
+                        maxHeightMessage: 'L\'image est trop grande (max {{ max_height }}px de haut).',
+                    ),
+                ],
             ])
         ;
     }

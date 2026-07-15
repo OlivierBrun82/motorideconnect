@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\FileUploader;
 use App\Entity\User;
 use App\Entity\Motorcycle;
 use App\Form\MotorcycleType;
@@ -30,7 +31,7 @@ final class MotorcycleController extends AbstractController
     }
 
     #[Route('/new', name: 'app_motorcycle_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em): Response
+    public function new(Request $request, EntityManagerInterface $em, FileUploader $fileUploader): Response
     {
         // Crée un objet moto vide, que le formulaire va remplir
         $motorcycle = new Motorcycle();
@@ -44,7 +45,14 @@ final class MotorcycleController extends AbstractController
             // Le propriétaire = l'user connecté (jamais choisi dans le form, sécurité)
             $motorcycle->setUser($this->getUser());
 
-            // TODO: traiter photoFile plus tard (futur service d'upload)
+            // Récupère le fichier envoyé (champ non mappé du form)
+            $photoFile = $form->get('photoFile')->getData();
+
+            // S'il y a un fichier, on le traite et on stocke son nom en base
+            if ($photoFile) {
+                $newFilename = $fileUploader->upload($photoFile, 'motorcycles');
+                $motorcycle->setPhoto($newFilename);
+            }
 
             // Nouvel objet => persist (Doctrine commence à le suivre) PUIS flush (INSERT)
             $em->persist($motorcycle);
@@ -74,7 +82,7 @@ final class MotorcycleController extends AbstractController
 
     // Édition d'une moto : réservée à son propriétaire
     #[Route('/{id}/edit', name: 'app_motorcycle_edit', methods: ['GET', 'POST'])]
-    public function edit(Motorcycle $motorcycle, Request $request, EntityManagerInterface $em) : Response
+    public function edit(Motorcycle $motorcycle, Request $request, EntityManagerInterface $em, FileUploader $fileUploader) : Response
     {
         // 🔒 Sécurité : seul le propriétaire peut modifier sa moto (sinon 403)
         if ($motorcycle->getUser() !== $this->getUser()) {
@@ -87,7 +95,14 @@ final class MotorcycleController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            // TODO: traiter photoFile plus tard (futur service d'upload)
+            // Récupère le fichier envoyé (champ non mappé du form)
+            $photoFile = $form->get('photoFile')->getData();
+
+            // S'il y a un nouveau fichier, on le traite ; sinon l'ancienne photo est conservée
+            if ($photoFile) {
+                $newFilename = $fileUploader->upload($photoFile, 'motorcycles');
+                $motorcycle->setPhoto($newFilename);
+            }
 
             // Objet DÉJÀ existant => pas de persist, juste flush (UPDATE)
             $em->flush();
