@@ -19,5 +19,6 @@
         <img src="{{ asset('uploads/motorcycles/' ~ motorcycle.photo) }}" alt="photo de la moto">
     {% endif %}
 
+    <a href="{{ path('app_ride_edit', {id: ride.id}) }}">Modifier</a> <br>
     <a href="{{ path('app_motorcycle') }}">Retour au garage</a>
 {% endblock %}

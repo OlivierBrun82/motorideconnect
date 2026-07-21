@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ ride.name }} {% endblock %}
+
+{% block body %}
+    <h1>{{ ride.name }}</h1> <br>
+
+    Statut : {{ride.statut.label}} <br>
+    Nombre d'inscrit : {{ ride.participants|length}} <br>
+    Places restantes : {{ ride.capacity - (ride.participants|length) }} / {{ ride.capacity }} <br>
+    Description : <p>{{ ride.descriptionMessage}}</p> <br>
+    Lieu de RDV : {{ ride.meetingPlace}} <br>
+    Date : {{ ride.meetingDatetime|date('d/m/Y H:i')}} <br>
+    Rhytme : {{ride.rideType.label}} <br>
+    Niveau Conseillé: {{ride.pilotLevel.label}} <br>
+    {% for moto in ride.motorcycles %}
+       {{ moto.brand.name ?? '' }} {{ moto.type.label }} ({{ moto.displacement }} cm³) moto de {{ moto.user.pseudo }} {% if not loop.last %}, {% endif %}
+    {% else %}
+        Aucune
+    {% endfor %}
+
+    <a href="{{ path('app_home') }}">Accueil</a>
+{% endblock %}
