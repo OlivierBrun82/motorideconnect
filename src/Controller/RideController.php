@@ -6,6 +6,8 @@ use App\Form\RideType;
 use App\Entity\Ride;
 use App\Entity\User;
 use App\Enum\RideStatus;
+use App\Form\RideFilterType;
+use App\Repository\RideRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,11 +20,17 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class RideController extends AbstractController
 {
 
-    #[Route('/', name: 'app_ride')]
-    public function index(): Response
+    #[Route('/', name: 'app_ride', methods: ['GET'])]
+    public function index(Request $request, RideRepository $rideRepository): Response
     {
+        $form = $this->createForm(RideFilterType::class);
+        $form->handleRequest($request);
+
+        $rides = $rideRepository->findByFilters($form->getData() ?? []);
+
         return $this->render('ride/index.html.twig', [
-            'controller_name' => 'RideController',
+            'form' => $form,
+            'rides' => $rides,
         ]);
     }
 
@@ -133,6 +141,6 @@ final class RideController extends AbstractController
 
         }
 
-        return $this->redirectToRoute('app_home');
+        return $this->redirectToRoute('app_ride');
     }
 }
