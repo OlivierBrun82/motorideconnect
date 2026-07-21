@@ -14,10 +14,10 @@
     Rhytme : {{ride.rideType.label}} <br>
     Niveau Conseillé: {{ride.pilotLevel.label}} <br>
     {% for moto in ride.motorcycles %}
-       {{ moto.brand.name ?? '' }} {{ moto.type.label }} ({{ moto.displacement }} cm³) moto de {{ moto.user.pseudo }} {% if not loop.last %}, {% endif %}
+        Moto de {{ moto.user.pseudo }} : {{ moto.brand.name ?? '' }} {{ moto.type.label }} ({{ moto.displacement }} cm³){% if not loop.last %}, {% endif %}
     {% else %}
         Aucune
     {% endfor %}
-
+    <br>
     <a href="{{ path('app_home') }}">Accueil</a>
 {% endblock %}
