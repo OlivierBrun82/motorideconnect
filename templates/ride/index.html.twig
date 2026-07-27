@@ -4,6 +4,8 @@
 
 {% block body %}
 
+<a href="{{ path('app_ride_new') }}">Créer une balade</a>
+
 {{ form_start(form) }}
     {{ form_widget(form) }}
     <button type="submit">Filtrer</button>
@@ -15,6 +17,7 @@
         <h2><a href="{{ path('app_ride_show', {id: ride.id}) }}">{{ ride.name }}</a></h2>
         <p>{{ ride.meetingDatetime|date('d/m/Y H:i') }} — {{ ride.departmentCode }}</p>
         <p>Statut : {{ ride.statut.label }} — Places restantes : {{ ride.capacity - (ride.participants|length) }}</p>
+        {{ include('ride/_participation.html.twig', {ride: ride}) }}
     </article>
 {% else %}
     <p>Aucune balade ne correspond à ta recherche.</p>
