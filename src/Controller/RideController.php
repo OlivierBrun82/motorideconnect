@@ -213,4 +213,31 @@ final class RideController extends AbstractController
 
         return $this->redirectToRoute('app_ride_show', ['id' => $ride->getId()]);
     }
+
+    #[Route('/like/{id}', name:'app_ride_like', methods:['POST'])]
+    public function like(Ride $ride, Request $request, EntityManagerInterface $em) : Response
+    {
+        if ($this->isCsrfTokenValid('like' . $ride->getId(), $request->request->get('_token'))) {
+            $user = $this->getUser();
+
+            // Seul un participant de la balade peut la liker
+            if (!$ride->getParticipants()->contains($user)) {
+                $this->addFlash('danger', 'Tu dois participer à la balade pour pouvoir la liker.');
+                return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_ride'));
+            }
+
+            if ($ride->getLikedBy()->contains($user)) {
+                $ride->removeLikedBy($user);
+            } else {
+                $ride->addLikedBy($user);
+            }
+
+            $em->flush();
+        }
+
+        // retour sur la page d'origine (show ou listing), repli sur le listing
+        $referer = $request->headers->get('referer');
+
+        return $this->redirect($referer ?? $this->generateUrl('app_ride'));
+    }
 }

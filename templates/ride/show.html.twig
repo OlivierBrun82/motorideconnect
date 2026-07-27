@@ -19,8 +19,9 @@
         Aucune
     {% endfor %}
     <br>
-
+    
     {{ include('ride/_participation.html.twig', {ride: ride}) }}
-
+    {{ include('ride/_like.html.twig', {ride: ride}) }}
+    
     <a href="{{ path('app_home') }}">Accueil</a>
 {% endblock %}
