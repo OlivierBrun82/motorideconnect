@@ -84,7 +84,7 @@ final class MotorcycleController extends AbstractController
     #[Route('/{id}/edit', name: 'app_motorcycle_edit', methods: ['GET', 'POST'])]
     public function edit(Motorcycle $motorcycle, Request $request, EntityManagerInterface $em, FileUploader $fileUploader) : Response
     {
-        // 🔒 Sécurité : seul le propriétaire peut modifier sa moto (sinon 403)
+        //  Sécurité : seul le propriétaire peut modifier sa moto (sinon 403)
         if ($motorcycle->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException('Cette moto ne vous appartient pas.');
         }
@@ -118,15 +118,15 @@ final class MotorcycleController extends AbstractController
     }
 
     // Suppression d'une moto : POST uniquement (jamais via un lien), propriétaire only
-    #[Route('/{id}', name: 'app_motorcycle_delete', methods: ['POST'])]
+    #[Route('/delete/{id}', name: 'app_motorcycle_delete', methods: ['POST'])]
     public function delete(Motorcycle $motorcycle, Request $request, EntityManagerInterface $em) : Response
     {
-        // 🔒 Sécurité : seul le propriétaire peut supprimer sa moto (sinon 403)
+        //  Sécurité : seul le propriétaire peut supprimer sa moto (sinon 403)
         if ($motorcycle->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException("Cette moto ne t'apartient pas!");
         }
 
-        // 🛡️ On ne supprime que si le token CSRF est valide (protège contre les requêtes forgées)
+        //  On ne supprime que si le token CSRF est valide (protège contre les requêtes forgées)
         if ($this->isCsrfTokenValid('delete' . $motorcycle->getId(), $request->request->get('_token'))) {
             // remove() marque pour suppression, flush() exécute le DELETE
             $em->remove($motorcycle);

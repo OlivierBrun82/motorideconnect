@@ -1,0 +1,31 @@
+{% if ride.user == app.user %}
+    {#L'utilisateur est l'organisateur : ni inscription ni désinscription #}
+    <p>Tu organises cette balade.</p>
+
+{% elseif ride.participants.contains(app.user) %}
+    {# Déjà inscrit : bouton de désinscription #}
+    <form method="post" action="{{ path('app_ride_leave', {id: ride.id}) }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('leave' ~ ride.id) }}">
+        <button type="submit">Je me désinscris</button>
+    </form>
+
+{% elseif ride.statut.value == 'open' and (ride.capacity - ride.participants|length) > 0 %}
+    {# Inscriptible : balade ouverte ET place dispo -> form avec moto optionnelle #}
+    <form method="post" action="{{ path('app_ride_participate', {id: ride.id}) }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('participate' ~ ride.id) }}">
+        <select name="motorcycle">
+            <option value="">Sans moto</option>
+            {% for moto in app.user.motorcycles %}
+                <option value="{{ moto.id }}">{{ moto.brand.name ?? '' }} {{ moto.type.label }} ({{ moto.displacement }} cm³)</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Je participe</button>
+    </form>
+    {% if app.user.motorcycles|length == 0 %}
+        <a href="{{ path('app_motorcycle_new') }}">Ajouter une moto au garage</a>
+    {% endif %}
+
+{% else %}
+    {# Ni inscriptible ni inscrit : complète, annulée... #}
+    <p>Inscriptions fermées ({{ include('ride/_status.html.twig', {ride: ride}) }}).</p>
+{% endif %}
