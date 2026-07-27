@@ -5,7 +5,7 @@
 {% block body %}
     <h1>{{ ride.name }}</h1> <br>
 
-    Statut : {{ride.statut.label}} <br>
+    Statut : {{ include('ride/_status.html.twig', {ride: ride}) }} <br>
     Nombre d'inscrit : {{ ride.participants|length}} <br>
     Places restantes : {{ ride.capacity - (ride.participants|length) }} / {{ ride.capacity }} <br>
     Description : <p>{{ ride.descriptionMessage}}</p> <br>

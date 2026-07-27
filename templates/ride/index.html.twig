@@ -16,7 +16,7 @@
     <article>
         <h2><a href="{{ path('app_ride_show', {id: ride.id}) }}">{{ ride.name }}</a></h2>
         <p>{{ ride.meetingDatetime|date('d/m/Y H:i') }} — {{ ride.departmentCode }}</p>
-        <p>Statut : {{ ride.statut.label }} — Places restantes : {{ ride.capacity - (ride.participants|length) }}</p>
+        <p>Statut : {{ include('ride/_status.html.twig', {ride: ride}) }} — Places restantes : {{ ride.capacity - (ride.participants|length) }}</p>
         {{ include('ride/_participation.html.twig', {ride: ride}) }}
     </article>
 {% else %}

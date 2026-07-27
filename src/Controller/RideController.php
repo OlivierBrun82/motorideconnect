@@ -197,4 +197,20 @@ final class RideController extends AbstractController
 
         return $this->redirectToRoute('app_ride_show', ['id' => $ride->getId()]);
     }
+
+    #[Route('/cancel/{id}', name:'app_ride_cancel', methods:['POST'])]
+    public function cancel(Ride $ride, Request $request, EntityManagerInterface $em) : Response
+    {
+        if ($ride->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException("Tu n'es pas le créateur de cette balade.");
+        }
+
+        if ($this->isCsrfTokenValid('cancel' . $ride->getId(), $request->request->get('_token'))) {
+            $ride->setStatut(RideStatus::Canceled);
+            $em->flush();
+            $this->addFlash('success', "Balade annulée.");
+        }
+
+        return $this->redirectToRoute('app_ride_show', ['id' => $ride->getId()]);
+    }
 }

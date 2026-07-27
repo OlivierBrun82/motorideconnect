@@ -9,6 +9,14 @@
         {{ form_widget(form) }}
         <button type="submit">Modifier</button> <br>
         {{ form_end(form) }}
+        {% if ride.statut.value != 'canceled' and ride.meetingDatetime > date() %}
+            <form method="post" action="{{ path('app_ride_cancel', {id: ride.id}) }}"
+                onsubmit="return confirm('Annuler cette balade ?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ ride.id) }}">
+                <button type="submit">Annuler la balade</button>
+            </form>
+        {% endif %}
+
         <form method="post" action="{{ path('app_ride_delete', {id: ride.id}) }}"
             onsubmit="return confirm('Supprimer cette balade ?');">
             <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ride.id) }}">
