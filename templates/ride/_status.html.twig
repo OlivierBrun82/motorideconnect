@@ -1,0 +1,7 @@
+{% if ride.statut.value == 'canceled' %}
+    Annulée
+{% elseif ride.meetingDatetime < date() %}
+    Terminée
+{% else %}
+    {{ ride.statut.label }}
+{% endif %}
