@@ -6,8 +6,11 @@ use App\Form\RideType;
 use App\Entity\Ride;
 use App\Entity\User;
 use App\Enum\RideStatus;
+use App\Exception\RideRegistrationException;
 use App\Form\RideFilterType;
+use App\Repository\MotorcycleRepository;
 use App\Repository\RideRepository;
+use App\Service\RideRegistrationManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -142,5 +145,56 @@ final class RideController extends AbstractController
         }
 
         return $this->redirectToRoute('app_ride');
+    }
+
+    #[Route('/participate/{id}', name: 'app_ride_participate', methods:['POST'])]
+    public function participate(Ride $ride, Request $request, RideRegistrationManager $manager, MotorcycleRepository $motorcycleRepository) : Response
+    {
+        // On récupère le token et vérifie sa validité, si invalide on redirige vers la fiche
+        if (!$this->isCsrfTokenValid('participate' . $ride->getId(), $request->request->get('_token'))) {
+            return $this->redirectToRoute('app_ride_show', ['id' => $ride->getId()]);
+        }
+
+        // On vérifie que la moto sélectionnée appartient bien à l'user
+        $user = $this->getUser();
+        $moto = null;
+
+        $motoId = $request->request->get('motorcycle');
+        if ($motoId) {
+            $moto = $motorcycleRepository->find($motoId);
+
+            if ($moto === null || $moto->getUser() !== $user) {
+                throw $this->createAccessDeniedException("Cette moto ne t'appartient pas, petit coquin!");
+            }
+        }
+
+        // on appelle le service
+        try {
+            $manager->join($ride, $user, $moto);
+            $this->addFlash('success', 'Inscription confirmée !');
+        } catch (RideRegistrationException $e) {
+            $this->addFlash('danger', $e->getMessage());
+        }
+
+        return $this->redirectToRoute('app_ride_show', ['id' => $ride->getId()]);
+    }
+
+    #[Route('/leave/{id}', name:'app_ride_leave', methods:['POST'])]
+    public function leave(Ride $ride, Request $request, RideRegistrationManager $manager) : Response
+    {
+        // Si pas de Token valid on redirige vers le show
+        if (!$this->isCsrfTokenValid('leave' .$ride->getId(), $request->request->get('_token'))) {
+            return $this->redirectToRoute('app_ride_show', ['id' => $ride->getId()]);
+        }
+
+        // sinon on retire l'user de la balade
+        try {
+            $manager->leave($ride, $this->getUser());
+            $this->addFlash('success', 'Tu es désinscrit de la balade.');
+        } catch (RideRegistrationException $e) {
+            $this->addFlash('danger', $e->getMessage());
+        }
+
+        return $this->redirectToRoute('app_ride_show', ['id' => $ride->getId()]);
     }
 }
