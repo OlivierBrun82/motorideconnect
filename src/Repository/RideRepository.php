@@ -16,28 +16,38 @@ class RideRepository extends ServiceEntityRepository
         parent::__construct($registry, Ride::class);
     }
 
-    //    /**
-    //     * @return Ride[] Returns an array of Ride objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('r.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    // Recherche des balades selon des filtres facultatifs (tableau issu du form de filtres)
+    public function findByFilters(array $filters) : array
+    {
+        // Requete de base : uniquement les balades a venir, triees par date de RDV croissante
+        $qb = $this->createQueryBuilder('r')
+            ->andWhere('r.meetingDatetime >= :now')
+            ->setParameter('now', new \DateTimeImmutable())
+            ->orderBy('r.meetingDatetime', 'ASC');
 
-    //    public function findOneBySomeField($value): ?Ride
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        // Filtres en egalite stricte : cle du filtre => propriete de l'entite Ride
+        $equalityFilters = [
+            'departmentCode' => 'r.departmentCode',
+            'rideType' => 'r.rideType',
+            'statut' => 'r.statut',
+        ];
+
+        // Pour chaque filtre renseigne, on greffe une condition "champ = valeur"
+        // ($field et $key sont maitrises cote code ; seule la valeur passe en parametre lie)
+        foreach ($equalityFilters as $key => $field) {
+            if (!empty($filters[$key])) {
+                $qb->andWhere("$field = :$key")
+                ->setParameter($key, $filters[$key]);
+            }
+        }
+
+        // Filtre date traite a part : operateur >= (et non =), se cumule avec la base
+        if (!empty($filters['dateFrom'])) {
+            $qb->andWhere('r.meetingDatetime >= :dateFrom')
+            ->setParameter('dateFrom', $filters['dateFrom']);
+        }
+
+        // Execute la requete DQL et renvoie le tableau d'objets Ride
+        return $qb->getQuery()->getResult();
+    }
 }

@@ -1,0 +1,16 @@
+{% if ride.participants.contains(app.user) %}
+    {# Seul un participant peut liker : on affiche le bouton toggle #}
+    <form method="post" action="{{ path('app_ride_like', {id: ride.id}) }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('like' ~ ride.id) }}">
+        <button type="submit">
+            {% if ride.likedBy.contains(app.user) %}
+                👍 Liké ({{ ride.likedBy|length }})
+            {% else %}
+                👍 Like ({{ ride.likedBy|length }})
+            {% endif %}
+        </button>
+    </form>
+{% else %}
+    {# Non-participant : compteur en lecture seule #}
+    <p>👍 {{ ride.likedBy|length }}</p>
+{% endif %}
