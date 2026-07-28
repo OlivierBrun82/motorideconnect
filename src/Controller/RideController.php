@@ -7,10 +7,12 @@ use App\Entity\Ride;
 use App\Entity\User;
 use App\Enum\RideStatus;
 use App\Exception\RideRegistrationException;
+use App\Form\CommentType;
 use App\Form\RideFilterType;
 use App\Repository\MotorcycleRepository;
 use App\Repository\RideRepository;
 use App\Service\RideRegistrationManager;
+use App\Entity\Comment;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -84,11 +86,40 @@ final class RideController extends AbstractController
         ]);
     }
 
-    #[Route('/show/{id}', name: 'app_ride_show', methods:['GET'])]
-        public function show(Ride $ride) : Response
+    #[Route('/show/{id}', name: 'app_ride_show', methods:['GET', 'POST'])]
+        public function show(Ride $ride, Request $request, EntityManagerInterface $em) : Response
         {
+            // construction du formulaire de commentaire (Comment vierge, rempli par le form)
+            $comment = new Comment();
+            $form = $this->createForm(CommentType::class, $comment);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $user = $this->getUser();
+
+                // la balade est active si elle n'est ni annulee ni passee
+                $isActive = $ride->getStatut() !== RideStatus::Canceled && $ride->getMeetingDatetime() > new \DateTimeImmutable();
+
+                // on ne publie que si l'utilisateur est participant, la balade active
+                // et le message non vide (blocage silencieux, sans message d'erreur)
+                if ($ride->getParticipants()->contains($user) && $isActive && trim((string) $comment->getMessage()) !== '') {
+                    // cablages serveur : auteur, balade et date (jamais dans le form)
+                    $comment->setUser($user);
+                    $comment->setRide($ride);
+                    $comment->setCreatedAt(new \DateTimeImmutable());
+
+                    $em->persist($comment);
+                    $em->flush();
+
+                    // on redirige vers la fiche pour eviter le re-post au refresh
+                    return $this->redirectToRoute('app_ride_show', ['id' => $ride->getId()]);
+                }
+            }
+
+            // affichage de la fiche + formulaire de commentaire
             return $this->render('ride/show.html.twig', [
-                'ride' => $ride
+                'ride' => $ride,
+                'form' => $form,
             ]);
 
         }
@@ -239,5 +270,26 @@ final class RideController extends AbstractController
         $referer = $request->headers->get('referer');
 
         return $this->redirect($referer ?? $this->generateUrl('app_ride'));
+    }
+
+    #[Route('/comment/delete/{id}', name: 'app_comment_delete', methods: ['POST'])]
+    public function deleteComment(Comment $comment, Request $request, EntityManagerInterface $em) : Response
+    {
+        // on récupère la balade à laquelle appartient le commentaire et son utilisateur
+        $ride = $comment->getRide();
+        $user = $this->getUser();
+
+        // seul l'auteur ou l'organisateur peuvent supprimer le commentaire
+        if ($comment->getUser() !== $user && $ride->getUser() !== $user) {
+            throw $this->createAccessDeniedException("Tu ne peux pas supprimer ce commentaire.");
+        }
+
+        // vérification du Csrf et supression du commentaire
+        if ($this->isCsrfTokenValid('delete_comment' . $comment->getId(), $request->request->get('_token'))) {
+            $em->remove($comment);
+            $em->flush();
+        }
+
+        return $this->redirectToRoute('app_ride_show', ['id' => $ride->getId()]);
     }
 }

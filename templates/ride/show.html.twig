@@ -22,6 +22,36 @@
     
     {{ include('ride/_participation.html.twig', {ride: ride}) }}
     {{ include('ride/_like.html.twig', {ride: ride}) }}
+
+<h2>Commentaires</h2>
+
+{% for comment in ride.comments %}
+    <div>
+        <strong>{{ comment.user.pseudo }}</strong>
+        <em>{{ comment.createdAt|date('d/m/Y H:i') }}</em>
+        <p>{{ comment.message }}</p>
+
+        {# bouton supprimer : auteur OU organisateur de la balade #}
+        {% if comment.user == app.user or ride.user == app.user %}
+            <form method="post" action="{{ path('app_comment_delete', {id: comment.id}) }}"
+                  onsubmit="return confirm('Supprimer ce commentaire ?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete_comment' ~ comment.id) }}">
+                <button type="submit">Supprimer</button>
+            </form>
+        {% endif %}
+    </div>
+{% else %}
+    <p>Aucun commentaire pour l'instant.</p>
+{% endfor %}
+
+{% if ride.participants.contains(app.user)
+      and ride.statut.value != 'canceled'
+      and ride.meetingDatetime > date() %}
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <button type="submit">Publier</button>
+    {{ form_end(form) }}
+{% endif %}
     
     <a href="{{ path('app_home') }}">Accueil</a>
 {% endblock %}
