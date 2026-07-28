@@ -81,9 +81,10 @@ final class RideController extends AbstractController
         }
 
         // premier affichage (GET) ou POST invalide => on (ré)affiche le formulaire
+        // statut 422 si soumission invalide, pour que Turbo remplace le form avec ses erreurs
         return $this->render('ride/new.html.twig', [
             'form' => $form,
-        ]);
+        ], new Response(null, $form->isSubmitted() && !$form->isValid() ? 422 : 200));
     }
 
     #[Route('/show/{id}', name: 'app_ride_show', methods:['GET', 'POST'])]
@@ -149,10 +150,11 @@ final class RideController extends AbstractController
                 ]);
             }
 
+            // statut 422 si soumission invalide, pour que Turbo remplace le form avec ses erreurs
             return $this->render('ride/edit.html.twig', [
                 'form' => $form,
                 'ride' => $ride
-            ]);
+            ], new Response(null, $form->isSubmitted() && !$form->isValid() ? 422 : 200));
         }
     
     #[Route('/delete/{id}', name: 'app_ride_delete', methods:['POST'])]
