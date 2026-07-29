@@ -38,6 +38,7 @@ class MotorcycleType extends AbstractType
                 'choice_label' => 'name',
                 'placeholder' => 'Choisis une marque',
                 'required' => false,
+                'autocomplete' => true,
             ])
             ->add('photoFile', FileType::class, [
                 'label' => 'Photo de la moto',
