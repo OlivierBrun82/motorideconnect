@@ -17,6 +17,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 
 class RegistrationController extends AbstractController
 {
@@ -25,7 +26,7 @@ class RegistrationController extends AbstractController
     }
 
     #[Route('/register', name: 'app_register')]
-    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, Security $security, EntityManagerInterface $entityManager): Response
+    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, Security $security, EntityManagerInterface $entityManager, RateLimiterFactoryInterface $registrationLimiter): Response
     {
         // redirige l'utilisateur qui est déjà connecté vers home
         if ($this->getUser()) {
@@ -37,6 +38,26 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Anti mail-bombing : on consomme un jeton par IP, avant tout persist ou envoi de mail
+            $limiter = $registrationLimiter->create($request->getClientIp());
+            $limit = $limiter->consume();
+
+            if (!$limit->isAccepted()) {
+                // getRetryAfter renvoie une date, pas un nombre de secondes : on calcule le delai restant
+                $waitingMinutes = max(1, (int) ceil(($limit->getRetryAfter()->getTimestamp() - time()) / 60));
+
+                $this->addFlash('error', sprintf(
+                    'Trop d\'inscriptions depuis cette connexion. Reessaie dans %d minute%s.',
+                    $waitingMinutes,
+                    $waitingMinutes > 1 ? 's' : ''
+                ));
+
+                // statut 429 : reponse non-200 obligatoire pour que Turbo reaffiche le formulaire
+                return $this->render('registration/register.html.twig', [
+                    'registrationForm' => $form,
+                ], new Response(null, Response::HTTP_TOO_MANY_REQUESTS));
+            }
+
             /** @var string $plainPassword */
             $plainPassword = $form->get('plainPassword')->getData();
 
