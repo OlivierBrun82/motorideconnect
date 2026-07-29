@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Data\FrenchDepartments;
 use App\Entity\Motorcycle;
 use App\Entity\Ride;
 use App\Enum\DriverLevel;
@@ -9,6 +10,7 @@ use App\Enum\RideRhythm;
 use App\Repository\MotorcycleRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
@@ -28,8 +30,11 @@ class RideType extends AbstractType
                 'label' => 'Donne une description de ta balade',
                 'required' => false,
             ])
-            ->add('departmentCode', null, [
-                'label' => 'Département'
+            ->add('departmentCode', ChoiceType::class, [
+                'label' => 'Département',
+                'choices' => FrenchDepartments::choices(),
+                'autocomplete' => true,
+                'placeholder' => 'Choisis un département',
             ])
             ->add('meetingDatetime', DateTimeType::class, [
                 'label' => 'Date et heure du rendez-vous',
