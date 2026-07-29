@@ -23,6 +23,29 @@
     {{ include('ride/_participation.html.twig', {ride: ride}) }}
     {{ include('ride/_like.html.twig', {ride: ride}) }}
 
+<h2>Participants</h2>
+<ul>
+    {% for participant in ride.participants %}
+        <li>
+            {{ participant.pseudo }}
+            {% if ride.user == app.user and participant != app.user and 'ROLE_ADMIN' not in participant.roles %}
+                {# Strike (motif obligatoire) #}
+                <form method="post" action="{{ path('app_ride_strike', {ride: ride.id, user: participant.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('strike_participant' ~ participant.id) }}">
+                    <input type="text" name="reason" placeholder="Motif" required>
+                    <button type="submit">Strike</button>
+                </form>
+                {# Exclure #}
+                <form method="post" action="{{ path('app_ride_exclude', {ride: ride.id, user: participant.id}) }}"
+                      onsubmit="return confirm('Exclure ce participant ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('exclude_participant' ~ participant.id) }}">
+                    <button type="submit">Exclure</button>
+                </form>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+
 <h2>Commentaires</h2>
 
 {% for comment in ride.comments %}
@@ -32,7 +55,7 @@
         <p>{{ comment.message }}</p>
 
         {# bouton supprimer : auteur OU organisateur de la balade #}
-        {% if comment.user == app.user or ride.user == app.user %}
+        {% if comment.user == app.user or ride.user == app.user or is_granted('ROLE_ADMIN') %}
             <form method="post" action="{{ path('app_comment_delete', {id: comment.id}) }}"
                   onsubmit="return confirm('Supprimer ce commentaire ?');">
                 <input type="hidden" name="_token" value="{{ csrf_token('delete_comment' ~ comment.id) }}">
@@ -53,5 +76,9 @@
     {{ form_end(form) }}
 {% endif %}
     
+    {% if ride.user == app.user or is_granted('ROLE_ADMIN') %}
+        <a href="{{ path('app_ride_edit', {id: ride.id}) }}">Gérer la balade</a> <br>
+    {% endif %}
+
     <a href="{{ path('app_home') }}">Accueil</a>
 {% endblock %}

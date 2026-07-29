@@ -33,9 +33,11 @@ final class AdminController extends AbstractController
         }
 
         if ($this->isCsrfTokenValid('strike' . $user->getId(), $request->request->get('_token'))) {
-            // motif lu dans le form, valeur par defaut si absent
-            $reason = $request->request->get('reason', 'Aucun motif');
-            $moderation->addStrike($user, $reason);
+            // motif obligatoire : pas de strike si le motif est vide
+            $reason = trim((string) $request->request->get('reason'));
+            if ($reason !== '') {
+                $moderation->addStrike($user, $reason);
+            }
         }
 
         return $this->redirectToRoute('app_admin');
