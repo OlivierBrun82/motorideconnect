@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Administration{% endblock %}
+
+{% block body %}
+    <h1>Modération des membres</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Pseudo</th><th>Email</th><th>Strikes</th><th>Statut</th><th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td>{{ user.pseudo }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.strikes|length }}</td>
+                <td>{{ user.bannedDate ? 'Banni' : 'Actif' }}</td>
+                <td>
+                    {% if user == app.user %}
+                        <em>C'est toi</em>
+                    {% else %}
+                        {# Infliger un strike (avec motif) #}
+                        <form method="post" action="{{ path('app_admin_strike', {id: user.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('strike' ~ user.id) }}">
+                            <input type="text" name="reason" placeholder="Motif">
+                            <button type="submit">Strike</button>
+                        </form>
+
+                        {# Bannir ou débannir selon l'état #}
+                        {% if user.bannedDate %}
+                            <form method="post" action="{{ path('app_admin_unban', {id: user.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('unban' ~ user.id) }}">
+                                <button type="submit">Débannir</button>
+                            </form>
+                        {% else %}
+                            <form method="post" action="{{ path('app_admin_ban', {id: user.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('ban' ~ user.id) }}">
+                                <button type="submit">Bannir</button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
