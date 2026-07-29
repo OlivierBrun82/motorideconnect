@@ -16,6 +16,20 @@
         <img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" alt="avatar de {{ app.user.pseudo }}">
     {% endif %}
 
+    {% if app.user.strikes|length > 0 %}
+        <section>
+            <h2>Mes avertissements ({{ app.user.strikes|length }})</h2>
+            {% if app.user.bannedDate %}
+                <p><strong>Ton compte est banni.</strong></p>
+            {% endif %}
+            <ul>
+                {% for strike in app.user.strikes %}
+                    <li>{{ strike.createdAt|date('d/m/Y H:i') }} — {{ strike.reason }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
+
     {{ form_start(profileForm) }}
         {{ form_widget(profileForm) }}
         <button type="submit">Enregistrer</button>

@@ -21,6 +21,10 @@ class UserChecker implements UserCheckerInterface
                 'Ton compte n\'est pas encore activé. Vérifie tes emails pour cliquer sur le lien de confirmation.'
             );
         }
+
+        if ($user->getBannedDate() !== null) {
+            throw new CustomUserMessageAccountStatusException('Ton compte a été banni. Tu ne peux plus te connecter.');
+        }
     }
 
     public function checkPostAuth(UserInterface $user): void

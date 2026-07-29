@@ -13,6 +13,7 @@ use App\Repository\MotorcycleRepository;
 use App\Repository\RideRepository;
 use App\Service\RideRegistrationManager;
 use App\Entity\Comment;
+use App\Service\ModerationManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -128,7 +129,8 @@ final class RideController extends AbstractController
     #[Route('/edit/{id}', name: 'app_ride_edit', methods:['GET', 'POST'])]
         public function edit(Ride $ride, Request $request, EntityManagerInterface $em) : Response
         {
-            if ($ride->getUser() !== $this->getUser()) {
+            // organisateur OU admin (override) peuvent editer
+            if ($ride->getUser() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
                 throw $this->createAccessDeniedException("Tu n'est pas le créateur de cette balade");
             }
 
@@ -161,7 +163,8 @@ final class RideController extends AbstractController
     public function delete(Ride $ride, Request $request, EntityManagerInterface $em) : Response
     {
         // vérification que c'est l'utilisateur de cette balade qui demande le delete
-        if ($ride->getUser() !== $this->getUser()) {
+        // organisateur OU admin (override) peuvent supprimer
+        if ($ride->getUser() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException("Tu n'est pas le createur de cette balade");
         }
 
@@ -234,7 +237,8 @@ final class RideController extends AbstractController
     #[Route('/cancel/{id}', name:'app_ride_cancel', methods:['POST'])]
     public function cancel(Ride $ride, Request $request, EntityManagerInterface $em) : Response
     {
-        if ($ride->getUser() !== $this->getUser()) {
+        // organisateur OU admin (override) peuvent annuler
+        if ($ride->getUser() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException("Tu n'es pas le créateur de cette balade.");
         }
 
@@ -282,13 +286,77 @@ final class RideController extends AbstractController
         $user = $this->getUser();
 
         // seul l'auteur ou l'organisateur peuvent supprimer le commentaire
-        if ($comment->getUser() !== $user && $ride->getUser() !== $user) {
+        // auteur, organisateur OU admin (override) peuvent supprimer le commentaire
+        if ($comment->getUser() !== $user && $ride->getUser() !== $user && !$this->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException("Tu ne peux pas supprimer ce commentaire.");
         }
 
         // vérification du Csrf et supression du commentaire
         if ($this->isCsrfTokenValid('delete_comment' . $comment->getId(), $request->request->get('_token'))) {
             $em->remove($comment);
+            $em->flush();
+        }
+
+        return $this->redirectToRoute('app_ride_show', ['id' => $ride->getId()]);
+    }
+
+    #[Route('/{ride}/participant/{user}/strike', name: 'app_ride_strike', methods:['POST'])]
+    public function strikeParticipant(Ride $ride, User $user, Request $request, ModerationManager $moderation) : Response
+    {
+        // Seul l'organisateur de cette balade peut moderer
+        if ($ride->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cette balade.");
+        }
+
+        // cible uniquement un participant de cette balade, et pas l'organisateur lui-meme
+        if ($user === $ride->getUser() || !$ride->getParticipants()->contains($user)) {
+            throw $this->createAccessDeniedException("Cette personne ne participe pas à ta balade.");
+        }
+
+        // un organisateur ne peut pas sanctionner un administrateur
+        if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+            throw $this->createAccessDeniedException("Tu ne peux pas sanctionner un administrateur.");
+        }
+
+        // verification CSRF puis attribution du strike (le service gere email + ban auto)
+        if ($this->isCsrfTokenValid('strike_participant' . $user->getId(), $request->request->get('_token'))) {
+            // motif obligatoire : pas de strike si le motif est vide
+            $reason = trim((string) $request->request->get('reason'));
+            if ($reason !== '') {
+                $moderation->addStrike($user, $reason);
+            }
+        }
+
+        return $this->redirectToRoute('app_ride_show', ['id' => $ride->getId()]);
+    }
+
+    #[Route('/{ride}/participant/{user}/exclude', name: 'app_ride_exclude', methods:['POST'])]
+    public function excludeParticipant(Ride $ride, User $user, Request $request, EntityManagerInterface $em) : Response
+    {
+        // Seul l'organisateur de cette balade peut exclure
+        if ($ride->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cette balade.");
+        }
+
+        // cible uniquement un participant de cette balade, et pas l'organisateur lui-meme
+        if ($user === $ride->getUser() || !$ride->getParticipants()->contains($user)) {
+            throw $this->createAccessDeniedException("Cette personne ne participe pas à ta balade.");
+        }
+
+        // un organisateur ne peut pas exclure un administrateur
+        if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+            throw $this->createAccessDeniedException("Tu ne peux pas exclure un administrateur.");
+        }
+
+        // verification CSRF puis exclusion (action locale : retrait de participants, pas un ban)
+        if ($this->isCsrfTokenValid('exclude_participant' . $user->getId(), $request->request->get('_token'))) {
+            $ride->removeParticipant($user);
+
+            // une place se libere : si la balade etait complete, elle redevient ouverte
+            if ($ride->getStatut() === RideStatus::Full) {
+                $ride->setStatut(RideStatus::Open);
+            }
+
             $em->flush();
         }
 
