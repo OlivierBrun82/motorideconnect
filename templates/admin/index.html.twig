@@ -25,7 +25,7 @@
                         {# Infliger un strike (avec motif) #}
                         <form method="post" action="{{ path('app_admin_strike', {id: user.id}) }}">
                             <input type="hidden" name="_token" value="{{ csrf_token('strike' ~ user.id) }}">
-                            <input type="text" name="reason" placeholder="Motif">
+                            <input type="text" name="reason" placeholder="Motif" required>
                             <button type="submit">Strike</button>
                         </form>
 
