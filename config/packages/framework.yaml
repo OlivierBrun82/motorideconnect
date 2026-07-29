@@ -5,6 +5,13 @@ framework:
     # Note that the session will be started ONLY if you read or write from it.
     session: true
 
+    # Anti mail-bombing : 3 inscriptions par heure et par IP
+    rate_limiter:
+        registration:
+            policy: 'fixed_window'
+            limit: 3
+            interval: '1 hour'
+
     #esi: true
     #fragments: true
 
