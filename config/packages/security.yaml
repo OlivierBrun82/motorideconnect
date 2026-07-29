@@ -20,6 +20,9 @@ security:
             lazy: true
             provider: app_user_provider
             user_checker: App\Security\UserChecker
+            # Anti brute-force : 5 tentatives échouées par minute (ip + username)
+            login_throttling:
+                max_attempts: 5
             form_login:
                 login_path: app_login
                 check_path: app_login
