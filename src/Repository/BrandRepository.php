@@ -16,28 +16,17 @@ class BrandRepository extends ServiceEntityRepository
         parent::__construct($registry, Brand::class);
     }
 
-    //    /**
-    //     * @return Brand[] Returns an array of Brand objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('b')
-    //            ->andWhere('b.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('b.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Brand
-    //    {
-    //        return $this->createQueryBuilder('b')
-    //            ->andWhere('b.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    // Recherche une marque par son nom, sans tenir compte de la casse ni des espaces autour.
+    // Garde-fou anti-doublon, utilise a la creation comme a l'edition d'une marque.
+    // setMaxResults(1) est indispensable : la base contient deja "Sol" et "SOL",
+    // getOneOrNullResult() leverait une NonUniqueResultException sans le LIMIT.
+    public function findOneByNameInsensitive(string $name) : ?Brand
+    {
+        return $this->createQueryBuilder('b')
+            ->andWhere('LOWER(b.name) = :name')
+            ->setParameter('name', mb_strtolower(trim($name)))
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }
