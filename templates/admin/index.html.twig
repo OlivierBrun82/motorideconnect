@@ -47,4 +47,36 @@
         {% endfor %}
         </tbody>
     </table>
+
+    <h2>Marques de moto</h2>
+
+    {# Ajout d'une marque absente du catalogue importé depuis data/brands.csv #}
+    <form method="post" action="{{ path('app_admin_brand_new') }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('brand_new') }}">
+        <input type="text" name="name" placeholder="Nouvelle marque" maxlength="100" required>
+        <button type="submit">Ajouter</button>
+    </form>
+
+    {# Choix de la marque à corriger : formulaire GET, recharge /admin?brand=42.
+       Le select est décoré par Tom Select (filtrage au clavier côté client). #}
+    <form method="get" action="{{ path('app_admin') }}">
+        <select name="brand"
+                data-controller="symfony--ux-autocomplete--autocomplete"
+                data-symfony--ux-autocomplete--autocomplete-no-results-found-text-value="Aucune marque trouvée">
+            <option value="">Choisis une marque</option>
+            {% for brand in brands %}
+                <option value="{{ brand.id }}"{{ brand == selectedBrand ? ' selected' : '' }}>{{ brand.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Éditer</button>
+    </form>
+
+    {# Correction du nom : se propage à toutes les motos, brand est une clé étrangère #}
+    {% if selectedBrand %}
+        <form method="post" action="{{ path('app_admin_brand_edit', {id: selectedBrand.id}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('brand_edit' ~ selectedBrand.id) }}">
+            <input type="text" name="name" value="{{ selectedBrand.name }}" maxlength="100" required>
+            <button type="submit">Enregistrer</button>
+        </form>
+    {% endif %}
 {% endblock %}
