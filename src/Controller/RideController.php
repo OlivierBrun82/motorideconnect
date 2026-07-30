@@ -13,6 +13,7 @@ use App\Form\CommentType;
 use App\Form\RideFilterType;
 use App\Repository\MotorcycleRepository;
 use App\Repository\RideRepository;
+use App\Service\RideCancellationManager;
 use App\Service\RideRegistrationManager;
 use App\Entity\Comment;
 use App\Service\ModerationManager;
@@ -248,15 +249,20 @@ final class RideController extends AbstractController
         try {
             $manager->leave($ride, $this->getUser());
             $this->addFlash('success', 'Tu es désinscrit de la balade.');
+
+            // desinscription reussie : on renvoie vers le listing,
+            // rester sur la fiche d'une balade qu'on vient de quitter n'a pas de sens
+            return $this->redirectToRoute('app_ride');
         } catch (RideRegistrationException $e) {
             $this->addFlash('danger', $e->getMessage());
         }
 
+        // en cas d'echec on reste sur la fiche : le message parle de cette balade
         return $this->redirectToRoute('app_ride_show', ['id' => $ride->getId()]);
     }
 
     #[Route('/cancel/{id}', name:'app_ride_cancel', methods:['POST'])]
-    public function cancel(Ride $ride, Request $request, EntityManagerInterface $em) : Response
+    public function cancel(Ride $ride, Request $request, RideCancellationManager $cancellationManager) : Response
     {
         // organisateur OU admin (override) peuvent annuler
         if ($ride->getUser() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
@@ -264,9 +270,27 @@ final class RideController extends AbstractController
         }
 
         if ($this->isCsrfTokenValid('cancel' . $ride->getId(), $request->request->get('_token'))) {
-            $ride->setStatut(RideStatus::Canceled);
-            $em->flush();
-            $this->addFlash('success', "Balade annulée.");
+            // le bouton est masque dans le template, mais un POST direct passerait :
+            // sans ce garde-fou une balade deja annulee ou passee pourrait etre re-annulee
+            if ($ride->getStatut() === RideStatus::Canceled || $ride->getMeetingDatetime() <= new \DateTimeImmutable()) {
+                $this->addFlash('danger', "Cette balade ne peut plus être annulée.");
+
+                return $this->redirectToRoute('app_ride_show', ['id' => $ride->getId()]);
+            }
+
+            $reason = trim((string) $request->request->get('reason'));
+            $reasonLength = mb_strlen($reason);
+
+            // la raison n'est jamais stockee (entites figees) : elle sert uniquement au mail
+            if ($reasonLength < 10 || $reasonLength > 500) {
+                $this->addFlash('danger', "Merci d'indiquer la raison de l'annulation (10 à 500 caractères).");
+
+                return $this->redirectToRoute('app_ride_edit', ['id' => $ride->getId()]);
+            }
+
+            // le service passe le statut a Canceled, flush, puis notifie les participants
+            $cancellationManager->cancel($ride, $reason);
+            $this->addFlash('success', "Balade annulée. Les participants ont été prévenus par email.");
         }
 
         return $this->redirectToRoute('app_ride_show', ['id' => $ride->getId()]);

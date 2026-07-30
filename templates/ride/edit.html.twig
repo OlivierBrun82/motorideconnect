@@ -13,6 +13,8 @@
             <form method="post" action="{{ path('app_ride_cancel', {id: ride.id}) }}"
                 onsubmit="return confirm('Annuler cette balade ?');">
                 <input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ ride.id) }}">
+                <label for="cancel_reason">Raison de l'annulation</label>
+                <textarea id="cancel_reason" name="reason" rows="3" required minlength="10" maxlength="500"></textarea>
                 <button type="submit">Annuler la balade</button>
             </form>
         {% endif %}
