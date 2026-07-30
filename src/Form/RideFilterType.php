@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Service\RideDuration;
 use App\Data\FrenchDepartments;
 use App\Enum\DriverLevel;
 use App\Enum\RideRhythm;
@@ -38,6 +39,12 @@ class RideFilterType extends AbstractType
                 'choice_label' => fn (DriverLevel $level) => $level->label(),
                 'required' => false,
                 'placeholder' => 'Tous les niveaux',
+            ])
+            ->add('duration', ChoiceType::class, [
+                'label' => 'Durée estimée',
+                'choices' => RideDuration::CHOICES,
+                'required' => false,
+                'placeholder' => 'Toutes les durées',
             ])
             ->add('statut', ChoiceType::class, [
                 'label' => 'Satut',

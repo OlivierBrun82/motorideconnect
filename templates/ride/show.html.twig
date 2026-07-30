@@ -11,6 +11,9 @@
     Description : <p>{{ ride.descriptionMessage}}</p> <br>
     Lieu de RDV : {{ ride.meetingPlace}} <br>
     Date : {{ ride.meetingDatetime|date('d/m/Y H:i')}} <br>
+    {% if duration %}
+        Durée estimée : {{ duration }} <br>
+    {% endif %}
     Rhytme : {{ride.rideType.label}} <br>
     Niveau Conseillé: {{ride.pilotLevel.label}} <br>
     {% for moto in ride.motorcycles %}

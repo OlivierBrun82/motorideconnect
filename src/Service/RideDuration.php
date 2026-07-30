@@ -76,6 +76,29 @@ final class RideDuration
     }
 
     /**
+     * Duree lisible pour l'affichage ("3h30", "45 min"), ou null si elle est inconnue.
+     *
+     * Le formatage vit ici et non dans Twig : une seule definition de la duree,
+     * et les templates n'ont aucun calcul a faire.
+     */
+    public function format(Ride $ride): ?string
+    {
+        $minutes = $this->minutes($ride);
+
+        if ($minutes === null) {
+            return null;
+        }
+
+        // Sous une heure, "45 min" se lit mieux que "0h45"
+        if ($minutes < 60) {
+            return $minutes.' min';
+        }
+
+        // %02d indispensable : sans lui, 180 minutes donnerait "3h0"
+        return sprintf('%dh%02d', intdiv($minutes, 60), $minutes % 60);
+    }
+
+    /**
      * Nombre de minutes ecoulees depuis minuit.
      *
      * On ne lit que les heures et les minutes : les colonnes sont des TIME sans date,
