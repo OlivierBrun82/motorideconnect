@@ -324,7 +324,7 @@ final class RideController extends AbstractController
     }
 
     #[Route('/comment/delete/{id}', name: 'app_comment_delete', methods: ['POST'])]
-    public function deleteComment(Comment $comment, Request $request, EntityManagerInterface $em) : Response
+    public function deleteComment(Comment $comment, Request $request, EntityManagerInterface $em, ModerationManager $moderation) : Response
     {
         // on récupère la balade à laquelle appartient le commentaire et son utilisateur
         $ride = $comment->getRide();
@@ -336,10 +336,40 @@ final class RideController extends AbstractController
             throw $this->createAccessDeniedException("Tu ne peux pas supprimer ce commentaire.");
         }
 
+        $author = $comment->getUser();
+
+        // supprimer son propre message est un retrait volontaire, pas une sanction :
+        // sans cette distinction, trois repentirs suffiraient a se faire bannir soi-meme
+        $isModeration = $author !== $user;
+
+        // un organisateur ne peut pas sanctionner un administrateur (meme regle que strikeParticipant)
+        if ($isModeration && !$this->isGranted('ROLE_ADMIN') && in_array('ROLE_ADMIN', $author->getRoles(), true)) {
+            throw $this->createAccessDeniedException("Tu ne peux pas sanctionner un administrateur.");
+        }
+
         // vérification du Csrf et supression du commentaire
         if ($this->isCsrfTokenValid('delete_comment' . $comment->getId(), $request->request->get('_token'))) {
+            $reason = trim((string) $request->request->get('reason'));
+
+            // en moderation le motif est obligatoire : il part en strike a l'auteur (CDC).
+            // on refuse la suppression plutot que de l'ignorer, sinon message supprime sans strike
+            if ($isModeration && mb_strlen($reason) < 10) {
+                $this->addFlash('danger', "Indique le motif de la suppression (10 caractères minimum), il sera envoyé à l'auteur.");
+
+                return $this->redirectToRoute('app_ride_show', ['id' => $ride->getId()]);
+            }
+
             $em->remove($comment);
             $em->flush();
+
+            // strike apres la suppression : si le mailer casse, le message litigieux
+            // a quand meme disparu. addStrike gere l'email et le ban auto a 3
+            if ($isModeration) {
+                $moderation->addStrike($author, $reason);
+                $this->addFlash('success', "Message supprimé, un avertissement a été envoyé à son auteur.");
+            } else {
+                $this->addFlash('success', "Ton commentaire a été supprimé.");
+            }
         }
 
         return $this->redirectToRoute('app_ride_show', ['id' => $ride->getId()]);
