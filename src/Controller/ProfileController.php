@@ -4,11 +4,14 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\ProfileFormType;
+use App\Service\AccountDeleter;
 use App\Service\FileUploader;
 use App\Service\ProfileUpdater;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -61,6 +64,41 @@ final class ProfileController extends AbstractController
         ]);
     }
     
+    // ATTENTION : cette route doit rester declaree AVANT app_profile_id.
+    // /{id} n'a aucune contrainte, donc il capterait /profile/delete (id = "delete")
+    // et l'utilisateur tomberait sur un 404 au lieu de supprimer son compte.
+    #[Route('/delete', name: 'app_profile_delete', methods: ['POST'])]
+    public function delete(Request $request, AccountDeleter $accountDeleter, UserPasswordHasherInterface $hasher, Security $security) : Response
+    {
+        // uniquement son propre compte : la moderation dispose deja du ban
+        $user = $this->getUser();
+
+        if (!$this->isCsrfTokenValid('delete_account', $request->request->get('_token'))) {
+            return $this->redirectToRoute('app_profile');
+        }
+
+        // action irreversible : on exige le mot de passe, le CSRF seul ne suffit pas
+        $password = (string) $request->request->get('password');
+
+        if (!$hasher->isPasswordValid($user, $password)) {
+            $this->addFlash('danger', 'Mot de passe incorrect, le compte n\'a pas été supprimé.');
+
+            return $this->redirectToRoute('app_profile');
+        }
+
+        // annule les balades a venir, desinscrit, puis anonymise
+        $accountDeleter->delete($user);
+
+        // la session pointe encore une identite qui n'existe plus sous ce nom :
+        // false = pas de validation du token CSRF de logout, on a deja valide le notre
+        $security->logout(false);
+
+        // le flash APRES le logout : l'invalidation de session effacerait un flash pose avant
+        $this->addFlash('success', 'Ton compte a été supprimé. Tes données personnelles ont été effacées.');
+
+        return $this->redirectToRoute('app_home');
+    }
+
     #[Route('/{id}', name:'app_profile_id')]
     public function show(User $user) : Response
     {
