@@ -34,4 +34,24 @@
         {{ form_widget(profileForm) }}
         <button type="submit">Enregistrer</button>
     {{ form_end(profileForm) }}
+
+    {# form separe, JAMAIS imbrique dans celui du profil : les forms HTML imbriques sont interdits #}
+    <section>
+        <h2>Supprimer mon compte</h2>
+        <p>
+            Cette action est irréversible. Tes données personnelles seront effacées
+            et tu ne pourras plus te connecter. Tes balades à venir seront annulées
+            et les participants prévenus par email.
+        </p>
+        <details>
+            <summary>Supprimer définitivement mon compte</summary>
+            <form method="post" action="{{ path('app_profile_delete') }}"
+                onsubmit="return confirm('Supprimer définitivement ton compte ? Cette action est irréversible.');">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete_account') }}">
+                <label for="delete_password">Confirme ton mot de passe</label>
+                <input type="password" id="delete_password" name="password" required autocomplete="current-password">
+                <button type="submit">Supprimer mon compte</button>
+            </form>
+        </details>
+    </section>
 {% endblock %}
