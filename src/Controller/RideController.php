@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Service\Paginator;
+use App\Service\RideDuration;
 use App\Form\RideType;
 use App\Entity\Ride;
 use App\Entity\User;
@@ -27,16 +29,34 @@ final class RideController extends AbstractController
 {
 
     #[Route('/', name: 'app_ride', methods: ['GET'])]
-    public function index(Request $request, RideRepository $rideRepository): Response
+    public function index(Request $request, RideRepository $rideRepository, RideDuration $rideDuration, Paginator $paginator): Response
     {
         $form = $this->createForm(RideFilterType::class);
         $form->handleRequest($request);
 
-        $rides = $rideRepository->findByFilters($form->getData() ?? []);
+        $filters = $form->getData() ?? [];
+        $rides = $rideRepository->findByFilters($filters);
+
+        // Filtre duree applique en PHP : la duree n'est stockee nulle part
+        // (entites figees), elle se recalcule a chaque fois -> pas filtrable en SQL.
+        // Sans tranche selectionnee on ne filtre rien : les balades sans endTime restent visibles.
+        // La pagination doit donc etre en PHP et venir APRES ce filtre,
+        // un LIMIT/OFFSET SQL donnerait des pages fausses sans lever d'erreur.
+        if (!empty($filters['duration'])) {
+            $rides = array_values(array_filter(
+                $rides,
+                fn (Ride $ride) => $rideDuration->matches($ride, $filters['duration'])
+            ));
+        }
+
+        // Decoupage en pages APRES le filtre duree : sur un tableau deja filtre,
+        // donc le compteur total et la taille des pages sont exacts.
+        $page = $request->query->getInt('page', 1);
+        $pagination = $paginator->paginate($rides, $page);
 
         return $this->render('ride/index.html.twig', [
             'form' => $form,
-            'rides' => $rides,
+            'pagination' => $pagination,
         ]);
     }
 
@@ -89,7 +109,7 @@ final class RideController extends AbstractController
     }
 
     #[Route('/show/{id}', name: 'app_ride_show', methods:['GET', 'POST'])]
-        public function show(Ride $ride, Request $request, EntityManagerInterface $em) : Response
+        public function show(Ride $ride, Request $request, EntityManagerInterface $em, RideDuration $rideDuration) : Response
         {
             // construction du formulaire de commentaire (Comment vierge, rempli par le form)
             $comment = new Comment();
@@ -122,6 +142,7 @@ final class RideController extends AbstractController
             return $this->render('ride/show.html.twig', [
                 'ride' => $ride,
                 'form' => $form,
+                'duration' => $rideDuration->format($ride),
             ]);
 
         }
