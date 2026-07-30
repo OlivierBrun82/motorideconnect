@@ -1,0 +1,13 @@
+{% if pagination.totalPages > 1 %}
+    <nav>
+        {% if pagination.hasPrevious %}
+            <a href="{{ path('app_ride', app.request.query.all|merge({page: pagination.previousPage})) }}">Précédent</a>
+        {% endif %}
+
+        <span>Page {{ pagination.currentPage }} sur {{ pagination.totalPages }}</span>
+
+        {% if pagination.hasNext %}
+            <a href="{{ path('app_ride', app.request.query.all|merge({page: pagination.nextPage})) }}">Suivant</a>
+        {% endif %}
+    </nav>
+{% endif %}
