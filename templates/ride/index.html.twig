@@ -10,9 +10,9 @@
     {{ form_widget(form) }}
     <button type="submit">Filtrer</button>
 {{ form_end(form) }}
+<p>{{ pagination.totalItems }} balade{{ pagination.totalItems > 1 ? 's' }} trouvée{{ pagination.totalItems > 1 ? 's' }}</p>
 
-
-{% for ride in rides %}
+{% for ride in pagination.items %}
     <article>
         <h2><a href="{{ path('app_ride_show', {id: ride.id}) }}">{{ ride.name }}</a></h2>
         <p>{{ ride.meetingDatetime|date('d/m/Y H:i') }} — {{ ride.departmentCode }}</p>
@@ -22,5 +22,5 @@
 {% else %}
     <p>Aucune balade ne correspond à ta recherche.</p>
 {% endfor %}
-
+{{ include('ride/_pagination.html.twig', {pagination: pagination}) }}
 {% endblock %}
