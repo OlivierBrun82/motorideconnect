@@ -29,6 +29,7 @@ class RideRepository extends ServiceEntityRepository
         $equalityFilters = [
             'departmentCode' => 'r.departmentCode',
             'rideType' => 'r.rideType',
+            'pilotLevel' => 'r.pilotLevel',
             'statut' => 'r.statut',
         ];
 
