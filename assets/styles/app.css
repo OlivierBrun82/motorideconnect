@@ -131,7 +131,7 @@ hr {
     margin: var(--space-5) 0;
 }
 
-/* Anneau de focus : l'un des trois seuls usages autorises de l'accent */
+/* Anneau de focus : l'un des quatre seuls usages autorises de l'accent */
 :focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
@@ -270,7 +270,7 @@ hr {
     text-decoration: none;
 }
 
-/* Onglet actif : l'un des trois seuls usages autorises de l'accent */
+/* Onglet actif : l'un des quatre seuls usages autorises de l'accent */
 .tabbar-item.is-active {
     color: var(--color-accent);
     font-weight: 600;
@@ -279,6 +279,337 @@ hr {
 /* La barre est fixe : cette reserve empeche qu'elle masque la fin du contenu */
 .tabbar-spacer {
     height: var(--tabbar-height);
+}
+
+/* Boutons : primaire ink plein, secondaire blanc a filet */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: var(--tap-target);
+    padding: var(--space-3) var(--space-5);
+    border: 1px solid transparent;
+    border-radius: var(--radius-control);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: var(--color-ink);
+    color: var(--color-surface);
+}
+
+.btn-secondary {
+    background-color: var(--color-surface);
+    border-color: var(--color-hairline);
+    color: var(--color-ink);
+}
+
+/* Retour tactile demande par la charte : le bouton s'enfonce d'un pixel */
+.btn:active {
+    transform: translateY(1px);
+}
+
+/* CTA pleine largeur, comme le bouton Rejoindre de la maquette */
+.btn-block {
+    display: flex;
+    width: 100%;
+}
+
+/* Champ de formulaire : le theme Symfony de D4 reprendra ces memes classes */
+.field {
+    margin-bottom: var(--space-4);
+}
+
+.field label {
+    display: block;
+    margin-bottom: var(--space-1);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-steel);
+}
+
+/* 16px obligatoire : en dessous, iOS zoome sur le champ au focus */
+.input {
+    display: block;
+    width: 100%;
+    min-height: var(--tap-target);
+    padding: var(--space-3);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-control);
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: 1rem;
+}
+
+/* Texte d'aide : sous le champ, jamais en infobulle */
+.field-help {
+    margin: var(--space-1) 0 0;
+    color: var(--color-steel);
+    font-size: 0.875rem;
+}
+
+/* Erreurs de champ : le gras porte l'alerte, pas une couleur */
+.field-errors {
+    margin: var(--space-1) 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+/* Case a cocher : le libelle passe a droite et reste cliquable */
+.field-check {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.field-check label {
+    margin-bottom: 0;
+    color: var(--color-ink);
+}
+
+.checkbox {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    accent-color: var(--color-ink);
+}
+
+/* Tom Select : son CSS est charge apres le notre, on repasse dessus par la specificite */
+.field .ts-control {
+    min-height: var(--tap-target);
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-control);
+    background-color: var(--color-surface);
+    box-shadow: none;
+    font-family: var(--font-body);
+    font-size: 1rem;
+}
+
+.field .ts-wrapper.focus .ts-control {
+    border-color: var(--color-accent);
+}
+
+.field .ts-dropdown {
+    margin-top: var(--space-1);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-control);
+    box-shadow: 0 2px 8px rgba(28, 28, 30, 0.08);
+}
+
+/* Option survolee : le theme d'origine la teinte en bleu pale */
+.field .ts-dropdown .active {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+}
+
+/* Messages flash : deux tons, differencies sans seconde couleur */
+.flash-success,
+.flash-danger {
+    margin-bottom: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-hairline);
+    border-left-width: 3px;
+    border-radius: var(--radius-control);
+    background-color: var(--color-surface);
+}
+
+.flash-success {
+    border-left-color: var(--color-steel);
+}
+
+/* L'erreur pese plus : filet ink et texte plus gras, jamais de rouge */
+.flash-danger {
+    border-left-color: var(--color-ink);
+    font-weight: 500;
+}
+
+/* Carte : une carte pour une entite, balade ou moto */
+.card {
+    margin-bottom: var(--space-4);
+    padding: var(--space-4);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-card);
+    background-color: var(--color-surface);
+    box-shadow: 0 1px 2px rgba(28, 28, 30, 0.04);
+}
+
+/* Rangee de tuiles : trois colonnes separees par un filet, comme sur l'accueil */
+.tile-row {
+    display: flex;
+    margin: var(--space-3) 0;
+    border-top: 1px solid var(--color-hairline);
+    border-bottom: 1px solid var(--color-hairline);
+}
+
+.tile-row .tile {
+    flex: 1;
+    padding: var(--space-3) var(--space-2);
+}
+
+.tile-row .tile + .tile {
+    border-left: 1px solid var(--color-hairline);
+}
+
+/* Grille de tuiles encadrees, comme sur la fiche balade */
+.tile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.tile-grid .tile {
+    padding: var(--space-3);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-control);
+    background-color: var(--color-surface);
+}
+
+/* Tuile occupant toute la largeur : kilometrage, itineraire */
+.tile-wide {
+    grid-column: 1 / -1;
+}
+
+.tile-value {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Chips : reservees aux enums, jamais decoratives */
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-pill);
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+/* Chip selectionnee : l'un des quatre seuls usages autorises de l'accent */
+.chip.is-selected {
+    border-color: var(--color-accent);
+    background-color: var(--color-accent);
+    color: var(--color-surface);
+}
+
+.chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+}
+
+/* Pastille de statut : quatre etats, distingues par remplissage et graisse */
+.pill {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* Ouverte : remplissage neutre plein, c'est l'etat courant */
+.pill-open {
+    background-color: var(--color-ink);
+    color: var(--color-surface);
+}
+
+/* Complete : meme remplissage, en plus sourd */
+.pill-full {
+    background-color: var(--color-steel);
+    color: var(--color-surface);
+}
+
+/* Terminee : simple contour, la balade appartient au passe */
+.pill-completed {
+    border-color: var(--color-steel);
+    color: var(--color-steel);
+}
+
+/* Annulee : contour et texte barre */
+.pill-canceled {
+    border-color: var(--color-steel);
+    color: var(--color-steel);
+    text-decoration: line-through;
+}
+
+/* Like : le remplissage est le seul signal d'etat, jamais la couleur du texte */
+.like {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--tap-target);
+    margin: 0;
+    padding: 0 var(--space-2);
+    border: 0;
+    background: none;
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* Coeur plein : l'un des quatre seuls usages autorises de l'accent */
+.like.is-liked .icon {
+    fill: var(--color-accent);
+    stroke: var(--color-accent);
+}
+
+/* Etat vide compose : une illustration, une phrase, un seul CTA */
+.empty-state {
+    padding: var(--space-6) var(--space-4);
+    text-align: center;
+}
+
+.empty-state p {
+    margin: var(--space-4) auto;
+    color: var(--color-steel);
+}
+
+/* Grand format d'icone, reserve aux illustrations d'etat vide */
+.icon-large {
+    width: 64px;
+    height: 64px;
+    color: var(--color-steel);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.25;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Libelle reserve aux lecteurs d'ecran, quand l'icone porte deja le sens */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    white-space: nowrap;
 }
 
 /* La charte plafonne le mouvement : on le coupe si l'utilisateur le demande */

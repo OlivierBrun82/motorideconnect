@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import '_icons.html.twig' as icon %}
 
 {% block title %}Hello RideController!{% endblock %}
 
@@ -8,7 +9,7 @@
 
 {{ form_start(form) }}
     {{ form_widget(form) }}
-    <button type="submit">Filtrer</button>
+    <button type="submit" class="btn btn-secondary btn-block">Filtrer</button>
 {{ form_end(form) }}
 <p>{{ pagination.totalItems }} balade{{ pagination.totalItems > 1 ? 's' }} trouvée{{ pagination.totalItems > 1 ? 's' }}</p>
 
@@ -18,11 +19,16 @@
         <p>{{ ride.meetingDatetime|date('d/m/Y H:i') }} — {{ ride.departmentCode }}</p>
         {% set organizerRideCount = organizerRideCounts[ride.user.id] %}
         <p>Organisateur : {{ ride.user.pseudo }} ({{ organizerRideCount }} balade{{ organizerRideCount > 1 ? 's' }} organisée{{ organizerRideCount > 1 ? 's' }})</p>
-        <p>Statut : {{ include('ride/_status.html.twig', {ride: ride}) }} — Places restantes : {{ ride.capacity - (ride.participants|length) }}</p>
+        <p>{{ include('ride/_status.html.twig', {ride: ride}) }} Places restantes : <span class="mono">{{ ride.capacity - (ride.participants|length) }}</span></p>
         {{ include('ride/_participation.html.twig', {ride: ride}) }}
     </article>
 {% else %}
-    <p>Aucune balade ne correspond à ta recherche.</p>
+    {# Etat vide compose : illustration, une phrase, un seul CTA (charte section 4) #}
+    <div class="empty-state">
+        {{ icon.wheel() }}
+        <p>Aucune balade ne correspond à ta recherche.</p>
+        <a class="btn btn-primary" href="{{ path('app_ride_new') }}">Créer une balade</a>
+    </div>
 {% endfor %}
 {{ include('ride/_pagination.html.twig', {pagination: pagination}) }}
 {% endblock %}

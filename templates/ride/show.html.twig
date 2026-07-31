@@ -6,7 +6,7 @@
     <h1>{{ ride.name }}</h1> <br>
 
     Organisateur : {{ ride.user.pseudo }} ({{ organizerRideCount }} balade{{ organizerRideCount > 1 ? 's' }} organisée{{ organizerRideCount > 1 ? 's' }}) <br>
-    Statut : {{ include('ride/_status.html.twig', {ride: ride}) }} <br>
+    {{ include('ride/_status.html.twig', {ride: ride}) }} <br>
     Nombre d'inscrit : {{ ride.participants|length}} <br>
     Places restantes : {{ ride.capacity - (ride.participants|length) }} / {{ ride.capacity }} <br>
     Description : <p>{{ ride.descriptionMessage}}</p> <br>
@@ -87,7 +87,7 @@
       and ride.meetingDatetime > date() %}
     {{ form_start(form) }}
         {{ form_widget(form) }}
-        <button type="submit">Publier</button>
+        <button type="submit" class="btn btn-secondary">Publier</button>
     {{ form_end(form) }}
 {% endif %}
     

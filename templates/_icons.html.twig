@@ -40,3 +40,19 @@
         <path d="M4 7 H20 M4 12 H20 M4 17 H20"/>
     </svg>
 {% endmacro %}
+
+{# Deux lobes en arc, deux flancs en courbe : le remplissage porte l'etat du like #}
+{% macro heart() %}
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 20.3 C6.5 15.6 3 12.6 3 9.4 A4.4 4.4 0 0 1 12 7.4 A4.4 4.4 0 0 1 21 9.4 C21 12.6 17.5 15.6 12 20.3 Z"/>
+    </svg>
+{% endmacro %}
+
+{# Roue a rayons : illustration des etats vides, format 64px via .icon-large #}
+{% macro wheel() %}
+    <svg class="icon-large" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"/>
+        <circle cx="12" cy="12" r="2.5"/>
+        <path d="M12 3 V9.5 M12 14.5 V21 M3 12 H9.5 M14.5 12 H21"/>
+    </svg>
+{% endmacro %}
