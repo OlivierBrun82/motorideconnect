@@ -5,6 +5,7 @@
 {% block body %}
     <h1>{{ ride.name }}</h1> <br>
 
+    Organisateur : {{ ride.user.pseudo }} ({{ organizerRideCount }} balade{{ organizerRideCount > 1 ? 's' }} organisée{{ organizerRideCount > 1 ? 's' }}) <br>
     Statut : {{ include('ride/_status.html.twig', {ride: ride}) }} <br>
     Nombre d'inscrit : {{ ride.participants|length}} <br>
     Places restantes : {{ ride.capacity - (ride.participants|length) }} / {{ ride.capacity }} <br>
