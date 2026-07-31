@@ -1,0 +1,46 @@
+{# Barre haute, deux variantes : menu (defaut) ou retour si back est fourni #}
+{% import '_icons.html.twig' as icon %}
+
+{% set title = title|default('MotoRide-Connect') %}
+{% set back = back|default(null) %}
+
+<header class="topbar">
+    {% if back %}
+        <a href="{{ back }}" class="topbar-action" aria-label="Retour">{{ icon.arrowLeft() }}</a>
+    {% else %}
+        <details class="menu">
+            <summary class="topbar-action" aria-label="Ouvrir le menu">{{ icon.burger() }}</summary>
+            <nav class="menu-panel" aria-label="Menu secondaire">
+                <ul>
+                    {% if app.user %}
+                        <li><a href="{{ path('app_motorcycle') }}">Mon garage</a></li>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <li><a href="{{ path('app_admin') }}">Administration</a></li>
+                        {% endif %}
+                    {% endif %}
+                    <li><a href="{{ path('app_legal') }}">Mentions légales</a></li>
+                    {% if app.user %}
+                        <li><a href="{{ path('app_logout') }}">Déconnexion</a></li>
+                    {% else %}
+                        <li><a href="{{ path('app_login') }}">Connexion</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </details>
+    {% endif %}
+
+    <span class="topbar-title">{{ title }}</span>
+
+    {% if not back and app.user %}
+        <a href="{{ path('app_profile') }}" class="topbar-action" aria-label="Mon profil">
+            {% if app.user.avatar %}
+                <img class="topbar-avatar" src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" alt="">
+            {% else %}
+                {{ icon.user() }}
+            {% endif %}
+        </a>
+    {% else %}
+        {# Espaceur : maintient le titre centre quand il n'y a pas d'action a droite #}
+        <span class="topbar-action" aria-hidden="true"></span>
+    {% endif %}
+</header>

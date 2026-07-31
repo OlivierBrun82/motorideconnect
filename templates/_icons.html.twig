@@ -1,0 +1,42 @@
+{# Icones au trait sur grille 24x24, style commun dans .icon (app.css) #}
+
+{% macro home() %}
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 10.5 L12 3 L21 10.5 V20 H3 Z"/>
+        <path d="M9.5 20 V14 H14.5 V20"/>
+    </svg>
+{% endmacro %}
+
+{% macro plusCircle() %}
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="8.5"/>
+        <path d="M12 8 V16 M8 12 H16"/>
+    </svg>
+{% endmacro %}
+
+{% macro magnifier() %}
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="10.5" cy="10.5" r="6.5"/>
+        <path d="M15.5 15.5 L21 21"/>
+    </svg>
+{% endmacro %}
+
+{% macro user() %}
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="8" r="3.5"/>
+        <path d="M4.5 20 C4.5 16.5 7.8 14.5 12 14.5 C16.2 14.5 19.5 16.5 19.5 20"/>
+    </svg>
+{% endmacro %}
+
+{% macro arrowLeft() %}
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20 12 H5"/>
+        <path d="M11 6 L5 12 L11 18"/>
+    </svg>
+{% endmacro %}
+
+{% macro burger() %}
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 7 H20 M4 12 H20 M4 17 H20"/>
+    </svg>
+{% endmacro %}
