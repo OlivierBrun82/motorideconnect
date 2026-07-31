@@ -87,8 +87,7 @@ class RideType extends AbstractType
                 'label' => 'Ta moto pour cette balade',
                 'class' => Motorcycle::class,
                 'choice_label' => fn (Motorcycle $m) => trim(($m->getBrand()?->getName() . ' ' . $m->getType()->label())) . ' (' . $m->getDisplacement() . ' cm³)',
-                // Non mappé : Ride.motorcycles est une collection (ManyToMany),
-                // ici on choisit UNE moto qu'on ajoutera à la main dans le contrôleur.
+                // Non mappé : on choisit UNE moto, ajoutée à la main dans le contrôleur
                 'mapped' => false,
                 'required' => false,
                 'placeholder' => 'Choisis une moto',

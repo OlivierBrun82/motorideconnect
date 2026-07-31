@@ -70,8 +70,7 @@ final class MotorcycleController extends AbstractController
         ]);
     }
 
-    // Consultation d'une moto (accessible à tout membre connecté).
-    // $motorcycle est chargée automatiquement depuis l'{id} (404 si inexistante)
+    // Consultation d'une moto, accessible à tout membre connecté
     #[Route('/show/{id}', name: 'app_motorcycle_show', methods: ['GET'])]
     public function show(Motorcycle $motorcycle) : Response
     {
