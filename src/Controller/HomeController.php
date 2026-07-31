@@ -14,4 +14,11 @@ final class HomeController extends AbstractController
     {
         return $this->render('home/index.html.twig', []);
     }
+
+    // Page statique, atteignable depuis le menu
+    #[Route('/mentions-legales', name: 'app_legal')]
+    public function legal(): Response
+    {
+        return $this->render('home/legal.html.twig', []);
+    }
 }

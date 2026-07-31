@@ -1,4 +1,3 @@
-/* Tokens de la charte : voir Documentations/DESIGN.md */
 :root {
     /* Couleurs : une seule teinte d'accent dans tout le systeme */
     --color-canvas: #F6F6F7;
@@ -32,6 +31,9 @@
 
     /* Cible tactile minimale imposee par la charte */
     --tap-target: 44px;
+
+    /* Hauteur de la barre d'onglets, reprise par la reserve d'espacement */
+    --tabbar-height: 64px;
 }
 
 *,
@@ -133,6 +135,150 @@ hr {
 :focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
+}
+
+/* Icones : trace au trait, la couleur suit le texte parent */
+.icon {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Barre haute : collante, sert de repere de positionnement au menu */
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    height: 56px;
+    padding: 0 var(--space-2);
+    background-color: var(--color-canvas);
+    border-bottom: 1px solid var(--color-hairline);
+}
+
+/* Titre tronque : les noms de balade depassent souvent la largeur disponible */
+.topbar-title {
+    flex: 1;
+    min-width: 0;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Boutons lateraux : largeur fixe des deux cotes pour garder le titre centre */
+.topbar-action {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: var(--tap-target);
+    height: var(--tap-target);
+    color: var(--color-ink);
+    text-decoration: none;
+}
+
+.topbar-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-pill);
+    object-fit: cover;
+}
+
+/* Retire le triangle natif du summary, qui doublerait l'icone burger */
+.menu > summary {
+    list-style: none;
+    cursor: pointer;
+}
+
+.menu > summary::-webkit-details-marker {
+    display: none;
+}
+
+/* Tiroir : positionne sous la barre pour recouvrir le contenu au lieu de le pousser */
+.menu-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-hairline);
+}
+
+.menu-panel ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.menu-panel a {
+    display: flex;
+    align-items: center;
+    min-height: var(--tap-target);
+    padding: 0 var(--space-4);
+    text-decoration: none;
+}
+
+.menu-panel li + li a {
+    border-top: 1px solid var(--color-hairline);
+}
+
+/* Barre d'onglets basse : pleine largeur, hors du gabarit .page */
+.tabbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    height: var(--tabbar-height);
+    background-color: var(--color-surface);
+    border-top: 1px solid var(--color-hairline);
+}
+
+.tabbar-list {
+    display: flex;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.tabbar-list li {
+    flex: 1;
+}
+
+.tabbar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
+    height: 100%;
+    min-height: var(--tap-target);
+    color: var(--color-steel);
+    font-size: 0.75rem;
+    line-height: 1;
+    text-decoration: none;
+}
+
+/* Onglet actif : l'un des trois seuls usages autorises de l'accent */
+.tabbar-item.is-active {
+    color: var(--color-accent);
+    font-weight: 600;
+}
+
+/* La barre est fixe : cette reserve empeche qu'elle masque la fin du contenu */
+.tabbar-spacer {
+    height: var(--tabbar-height);
 }
 
 /* La charte plafonne le mouvement : on le coupe si l'utilisateur le demande */

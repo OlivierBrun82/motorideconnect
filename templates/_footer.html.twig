@@ -1,0 +1,36 @@
+{# Barre d'onglets basse : presente sur les ecrans principaux uniquement #}
+{% if app.user %}
+    {% import '_icons.html.twig' as icon %}
+    {% set route = app.request.attributes.get('_route') %}
+
+    <div class="tabbar-spacer"></div>
+
+    <nav class="tabbar" aria-label="Navigation principale">
+        <ul class="tabbar-list">
+            <li>
+                <a href="{{ path('app_home') }}" class="tabbar-item{{ route == 'app_home' ? ' is-active' : '' }}"
+                   {% if route == 'app_home' %}aria-current="page"{% endif %}>
+                    {{ icon.home() }}<span>Accueil</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ path('app_ride_new') }}" class="tabbar-item{{ route == 'app_ride_new' ? ' is-active' : '' }}"
+                   {% if route == 'app_ride_new' %}aria-current="page"{% endif %}>
+                    {{ icon.plusCircle() }}<span>Créer</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ path('app_ride') }}" class="tabbar-item{{ route == 'app_ride' ? ' is-active' : '' }}"
+                   {% if route == 'app_ride' %}aria-current="page"{% endif %}>
+                    {{ icon.magnifier() }}<span>Rechercher</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ path('app_profile') }}" class="tabbar-item{{ route starts with 'app_profile' ? ' is-active' : '' }}"
+                   {% if route starts with 'app_profile' %}aria-current="page"{% endif %}>
+                    {{ icon.user() }}<span>Profil</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+{% endif %}
