@@ -21,9 +21,7 @@ final class AdminController extends AbstractController
     #[Route('/', name: 'app_admin', methods: ['GET'])]
     public function index(UserRepository $userRepository, BrandRepository $brandRepository, Request $request): Response
     {
-        // Marque a corriger, choisie dans le select. Null tant que rien n'est selectionne.
-        // Un id inexistant ou non numerique donne null : c'est une selection, pas une ressource,
-        // donc pas de 404.
+        // Marque a corriger, choisie dans le select (null si aucune selection).
         $selectedBrand = null;
         $brandId = $request->query->getInt('brand');
         if ($brandId > 0) {
@@ -112,8 +110,7 @@ final class AdminController extends AbstractController
         return $this->redirectToRoute('app_admin');
     }
 
-    // Corrige le nom d'une marque existante (coquilles du CSV d'import).
-    // La correction se propage a toutes les motos : brand est une FK, pas une copie du texte.
+    // Corrige le nom d'une marque existante.
     #[Route('/brand/{id}/edit', name: 'app_admin_brand_edit', methods: ['POST'])]
     public function brandEdit(Brand $brand, Request $request, EntityManagerInterface $em, BrandRepository $brandRepository) : Response
     {
@@ -134,10 +131,7 @@ final class AdminController extends AbstractController
         return $this->redirectToRoute('app_admin');
     }
 
-    // Verifie un nom de marque saisi par l'admin.
-    // Retourne le message d'erreur a afficher, ou null si le nom est valide.
-    // $current = la marque en cours d'edition (null a la creation) : sans elle,
-    // reenregistrer une marque sans changer son nom se refuserait elle-meme comme doublon.
+    // Verifie un nom de marque : retourne le message d'erreur, ou null si valide.
     private function validateBrandName(string $name, BrandRepository $brandRepository, ?Brand $current = null) : ?string
     {
         if ($name === '') {
@@ -149,8 +143,7 @@ final class AdminController extends AbstractController
             return 'Le nom de la marque ne doit pas dépasser 100 caractères.';
         }
 
-        // Doctrine ne rend qu'un seul objet par ligne (identity map),
-        // donc la comparaison d'objets suffit pour reconnaitre la marque editee.
+        // Doctrine ne rend qu'une instance par ligne : la comparaison d'objets suffit.
         $existing = $brandRepository->findOneByNameInsensitive($name);
         if ($existing !== null && $existing !== $current) {
             return sprintf('La marque « %s » existe déjà.', $existing->getName());

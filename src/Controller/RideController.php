@@ -38,11 +38,7 @@ final class RideController extends AbstractController
         $filters = $form->getData() ?? [];
         $rides = $rideRepository->findByFilters($filters);
 
-        // Filtre duree applique en PHP : la duree n'est stockee nulle part
-        // (entites figees), elle se recalcule a chaque fois -> pas filtrable en SQL.
-        // Sans tranche selectionnee on ne filtre rien : les balades sans endTime restent visibles.
-        // La pagination doit donc etre en PHP et venir APRES ce filtre,
-        // un LIMIT/OFFSET SQL donnerait des pages fausses sans lever d'erreur.
+        // Filtre duree applique en PHP : la duree n'est pas stockee, donc pas filtrable en SQL.
         if (!empty($filters['duration'])) {
             $rides = array_values(array_filter(
                 $rides,
@@ -50,17 +46,11 @@ final class RideController extends AbstractController
             ));
         }
 
-        // Decoupage en pages APRES le filtre duree : sur un tableau deja filtre,
-        // donc le compteur total et la taille des pages sont exacts.
+        // Decoupage en pages, toujours APRES le filtre duree.
         $page = $request->query->getInt('page', 1);
         $pagination = $paginator->paginate($rides, $page);
 
-        // Nombre de balades par organisateur, indexe par id d'organisateur.
-        // Construit APRES la pagination : seules les balades affichees comptent,
-        // soit 5 organisateurs au maximum. Le ??= evite de recompter deux fois
-        // le meme membre s'il organise plusieurs balades de la page.
-        // Le tableau est bati depuis ces memes balades, donc aucune cle ne peut
-        // manquer cote Twig, y compris pour un organisateur a zero balade active.
+        // Nombre de balades par organisateur, pour les balades de la page.
         $organizerRideCounts = [];
         foreach ($pagination->items as $ride) {
             $organizerId = $ride->getUser()->getId();
@@ -81,8 +71,7 @@ final class RideController extends AbstractController
         $user = $this->getUser();
         // on crée une nouvelle instance de Ride (vide, remplie par le formulaire)
         $ride = new Ride();
-        // on relie le form à cet objet, en lui passant le user connecté
-        // (l'option 'owner' sert au query_builder du champ moto : ne lister que SES motos)
+        // on relie le form à l'objet ; l'option 'owner' filtre le champ moto sur SES motos
         $form = $this->createForm(RideType::class, $ride, ['owner' => $user]);
         // lit la requête et injecte les données dans $ride
         $form->handleRequest($request);
@@ -115,8 +104,7 @@ final class RideController extends AbstractController
             return $this->redirectToRoute('app_ride_show', ['id' => $ride->getId()]);
         }
 
-        // premier affichage (GET) ou POST invalide => on (ré)affiche le formulaire
-        // statut 422 si soumission invalide, pour que Turbo remplace le form avec ses erreurs
+        // premier affichage (GET) ou POST invalide : 422 pour que Turbo remplace le form
         return $this->render('ride/new.html.twig', [
             'form' => $form,
         ], new Response(null, $form->isSubmitted() && !$form->isValid() ? 422 : 200));
@@ -136,8 +124,7 @@ final class RideController extends AbstractController
                 // la balade est active si elle n'est ni annulee ni passee
                 $isActive = $ride->getStatut() !== RideStatus::Canceled && $ride->getMeetingDatetime() > new \DateTimeImmutable();
 
-                // on ne publie que si l'utilisateur est participant, la balade active
-                // et le message non vide (blocage silencieux, sans message d'erreur)
+                // publication reservee aux participants, balade active et message non vide
                 if ($ride->getParticipants()->contains($user) && $isActive && trim((string) $comment->getMessage()) !== '') {
                     // cablages serveur : auteur, balade et date (jamais dans le form)
                     $comment->setUser($user);
@@ -199,7 +186,6 @@ final class RideController extends AbstractController
     #[Route('/delete/{id}', name: 'app_ride_delete', methods:['POST'])]
     public function delete(Ride $ride, Request $request, EntityManagerInterface $em) : Response
     {
-        // vérification que c'est l'utilisateur de cette balade qui demande le delete
         // organisateur OU admin (override) peuvent supprimer
         if ($ride->getUser() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException("Tu n'est pas le createur de cette balade");
@@ -265,8 +251,7 @@ final class RideController extends AbstractController
             $manager->leave($ride, $this->getUser());
             $this->addFlash('success', 'Tu es désinscrit de la balade.');
 
-            // desinscription reussie : on renvoie vers le listing,
-            // rester sur la fiche d'une balade qu'on vient de quitter n'a pas de sens
+            // desinscription reussie : retour au listing, pas a la balade quittee
             return $this->redirectToRoute('app_ride');
         } catch (RideRegistrationException $e) {
             $this->addFlash('danger', $e->getMessage());
@@ -285,8 +270,7 @@ final class RideController extends AbstractController
         }
 
         if ($this->isCsrfTokenValid('cancel' . $ride->getId(), $request->request->get('_token'))) {
-            // le bouton est masque dans le template, mais un POST direct passerait :
-            // sans ce garde-fou une balade deja annulee ou passee pourrait etre re-annulee
+            // garde-fou serveur : une balade deja annulee ou passee ne se re-annule pas
             if ($ride->getStatut() === RideStatus::Canceled || $ride->getMeetingDatetime() <= new \DateTimeImmutable()) {
                 $this->addFlash('danger', "Cette balade ne peut plus être annulée.");
 
@@ -345,7 +329,6 @@ final class RideController extends AbstractController
         $ride = $comment->getRide();
         $user = $this->getUser();
 
-        // seul l'auteur ou l'organisateur peuvent supprimer le commentaire
         // auteur, organisateur OU admin (override) peuvent supprimer le commentaire
         if ($comment->getUser() !== $user && $ride->getUser() !== $user && !$this->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException("Tu ne peux pas supprimer ce commentaire.");
@@ -353,8 +336,7 @@ final class RideController extends AbstractController
 
         $author = $comment->getUser();
 
-        // supprimer son propre message est un retrait volontaire, pas une sanction :
-        // sans cette distinction, trois repentirs suffiraient a se faire bannir soi-meme
+        // supprimer son propre message est un retrait volontaire, jamais une sanction
         $isModeration = $author !== $user;
 
         // un organisateur ne peut pas sanctionner un administrateur (meme regle que strikeParticipant)
@@ -366,8 +348,7 @@ final class RideController extends AbstractController
         if ($this->isCsrfTokenValid('delete_comment' . $comment->getId(), $request->request->get('_token'))) {
             $reason = trim((string) $request->request->get('reason'));
 
-            // en moderation le motif est obligatoire : il part en strike a l'auteur (CDC).
-            // on refuse la suppression plutot que de l'ignorer, sinon message supprime sans strike
+            // en moderation le motif est obligatoire : sans lui, suppression refusee
             if ($isModeration && mb_strlen($reason) < 10) {
                 $this->addFlash('danger', "Indique le motif de la suppression (10 caractères minimum), il sera envoyé à l'auteur.");
 
@@ -377,8 +358,7 @@ final class RideController extends AbstractController
             $em->remove($comment);
             $em->flush();
 
-            // strike apres la suppression : si le mailer casse, le message litigieux
-            // a quand meme disparu. addStrike gere l'email et le ban auto a 3
+            // strike apres la suppression ; addStrike gere l'email et le ban auto a 3
             if ($isModeration) {
                 $moderation->addStrike($author, $reason);
                 $this->addFlash('success', "Message supprimé, un avertissement a été envoyé à son auteur.");

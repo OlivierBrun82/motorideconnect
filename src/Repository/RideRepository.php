@@ -36,7 +36,6 @@ class RideRepository extends ServiceEntityRepository
         ];
 
         // Pour chaque filtre renseigne, on greffe une condition "champ = valeur"
-        // ($field et $key sont maitrises cote code ; seule la valeur passe en parametre lie)
         foreach ($equalityFilters as $key => $field) {
             if (!empty($filters[$key])) {
                 $qb->andWhere("$field = :$key")

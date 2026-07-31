@@ -50,15 +50,14 @@
 
     <h2>Marques de moto</h2>
 
-    {# Ajout d'une marque absente du catalogue importé depuis data/brands.csv #}
+    {# Ajout d'une marque absente du catalogue #}
     <form method="post" action="{{ path('app_admin_brand_new') }}">
         <input type="hidden" name="_token" value="{{ csrf_token('brand_new') }}">
         <input type="text" name="name" placeholder="Nouvelle marque" maxlength="100" required>
         <button type="submit">Ajouter</button>
     </form>
 
-    {# Choix de la marque à corriger : formulaire GET, recharge /admin?brand=42.
-       Le select est décoré par Tom Select (filtrage au clavier côté client). #}
+    {# Choix de la marque à corriger : recharge /admin?brand=42 #}
     <form method="get" action="{{ path('app_admin') }}">
         <select name="brand"
                 data-controller="symfony--ux-autocomplete--autocomplete"
@@ -71,7 +70,7 @@
         <button type="submit">Éditer</button>
     </form>
 
-    {# Correction du nom : se propage à toutes les motos, brand est une clé étrangère #}
+    {# Correction du nom de la marque sélectionnée #}
     {% if selectedBrand %}
         <form method="post" action="{{ path('app_admin_brand_edit', {id: selectedBrand.id}) }}">
             <input type="hidden" name="_token" value="{{ csrf_token('brand_edit' ~ selectedBrand.id) }}">
