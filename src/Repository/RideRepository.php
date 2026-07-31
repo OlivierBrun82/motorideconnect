@@ -2,7 +2,9 @@
 
 namespace App\Repository;
 
+use App\Entity\User;
 use App\Entity\Ride;
+use App\Enum\RideStatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -50,5 +52,18 @@ class RideRepository extends ServiceEntityRepository
 
         // Execute la requete DQL et renvoie le tableau d'objets Ride
         return $qb->getQuery()->getResult();
+    }
+
+    // Compte les balades organisees par ce membre, annulations exclues.
+    public function countByOrganizer(User $organizer) : int
+    {
+        return (int) $this->createQueryBuilder('r')
+            ->select('COUNT(r.id)')
+            ->andWhere('r.user = :organizer')
+            ->andWhere('r.statut != :canceled')
+            ->setParameter('organizer', $organizer)
+            ->setParameter('canceled', RideStatus::Canceled)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }
