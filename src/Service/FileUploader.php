@@ -35,18 +35,14 @@ class FileUploader
         // Dossier de destination (ex. public/uploads/motorcycles)
         $destination = $this->uploadsDir . '/' . $subDirectory;
 
-        // Traite l'image (resize + conversion WebP + suppression de l'EXIF)
-        // et l'écrit directement à destination.
+        // Traite l'image (resize + WebP + suppression de l'EXIF) et l'écrit à destination
         $this->processImage($file->getPathname(), $destination . '/' . $newFilename);
 
         // On renvoie juste le nom : c'est lui qu'on stockera en base
         return $newFilename;
     }
 
-    
-     // Lit l'image source, la redimensionne si besoin, la ré-enregistre en WebP.
-     // Le ré-encodage ne recopie AUCUNE métadonnée EXIF (vie privée).
-     
+    // Lit l'image source, la redimensionne si besoin, la ré-enregistre en WebP
     private function processImage(string $sourcePath, string $destinationPath): void
     {
         // 1. Lit les infos de l'image source (dimensions + type réel)
@@ -87,7 +83,6 @@ class FileUploader
         );
 
         // 5. Enregistre en WebP en baissant la qualité tant que le fichier dépasse 3 Mo
-        //    (pas d'EXIF repris au passage). On s'arrête à une qualité plancher de 40.
         $quality = 80;
         do {
             imagewebp($destination, $destinationPath, $quality);

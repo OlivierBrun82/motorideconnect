@@ -16,13 +16,11 @@ final class RideDuration
     public const MEDIUM = 'medium';
     public const LONG = 'long';
 
-    // Bornes en minutes : court < 120 <= moyen <= 240 < long.
-    // Privees : personne d'autre n'a besoin de connaitre les seuils.
+    // Bornes en minutes : court < 120 <= moyen <= 240 < long
     private const MEDIUM_MIN = 120;
     private const MEDIUM_MAX = 240;
 
-    // Format attendu par l'option "choices" d'un ChoiceType : libelle affiche => valeur.
-    // Publique : consommee par RideFilterType.
+    // Format attendu par l'option "choices" d'un ChoiceType : libelle => valeur
     public const CHOICES = [
         'Moins de 2h' => self::SHORT,
         'De 2h à 4h' => self::MEDIUM,
@@ -59,8 +57,7 @@ final class RideDuration
     {
         $minutes = $this->minutes($ride);
 
-        // Duree inconnue : la balade ne peut etre rangee dans aucune tranche,
-        // on ne peut pas affirmer qu'elle est courte
+        // Duree inconnue : la balade n'entre dans aucune tranche
         if ($minutes === null) {
             return false;
         }
@@ -69,8 +66,7 @@ final class RideDuration
             self::SHORT => $minutes < self::MEDIUM_MIN,
             self::MEDIUM => $minutes >= self::MEDIUM_MIN && $minutes <= self::MEDIUM_MAX,
             self::LONG => $minutes > self::MEDIUM_MAX,
-            // Tranche inconnue (URL trafiquee) : on ne filtre rien plutot que
-            // de renvoyer une liste vide inexplicable
+            // Tranche inconnue (URL trafiquee) : on ne filtre rien
             default => true,
         };
     }

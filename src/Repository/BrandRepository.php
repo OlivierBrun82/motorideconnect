@@ -16,10 +16,7 @@ class BrandRepository extends ServiceEntityRepository
         parent::__construct($registry, Brand::class);
     }
 
-    // Recherche une marque par son nom, sans tenir compte de la casse ni des espaces autour.
-    // Garde-fou anti-doublon, utilise a la creation comme a l'edition d'une marque.
-    // setMaxResults(1) est indispensable : la base contient deja "Sol" et "SOL",
-    // getOneOrNullResult() leverait une NonUniqueResultException sans le LIMIT.
+    // Recherche une marque par son nom, insensible a la casse et aux espaces.
     public function findOneByNameInsensitive(string $name) : ?Brand
     {
         return $this->createQueryBuilder('b')
