@@ -1,16 +1,22 @@
+{% import '_icons.html.twig' as icon %}
+
+{% set isLiked = ride.participants.contains(app.user) and ride.likedBy.contains(app.user) %}
+
 {% if ride.participants.contains(app.user) %}
     {# Seul un participant peut liker : on affiche le bouton toggle #}
     <form method="post" action="{{ path('app_ride_like', {id: ride.id}) }}">
         <input type="hidden" name="_token" value="{{ csrf_token('like' ~ ride.id) }}">
-        <button type="submit">
-            {% if ride.likedBy.contains(app.user) %}
-                👍 Liké ({{ ride.likedBy|length }})
-            {% else %}
-                👍 Like ({{ ride.likedBy|length }})
-            {% endif %}
+        <button type="submit" class="like{{ isLiked ? ' is-liked' }}" aria-pressed="{{ isLiked ? 'true' : 'false' }}">
+            {{ icon.heart() }}
+            <span class="visually-hidden">{{ isLiked ? 'Ne plus aimer cette balade' : 'Aimer cette balade' }}</span>
+            {{ ride.likedBy|length }}
         </button>
     </form>
 {% else %}
     {# Non-participant : compteur en lecture seule #}
-    <p>👍 {{ ride.likedBy|length }}</p>
+    <p class="like">
+        {{ icon.heart() }}
+        <span class="visually-hidden">Nombre de likes</span>
+        {{ ride.likedBy|length }}
+    </p>
 {% endif %}

@@ -46,7 +46,7 @@ class RegistrationController extends AbstractController
                 // getRetryAfter renvoie une date, pas un nombre de secondes : on calcule le delai restant
                 $waitingMinutes = max(1, (int) ceil(($limit->getRetryAfter()->getTimestamp() - time()) / 60));
 
-                $this->addFlash('error', sprintf(
+                $this->addFlash('danger', sprintf(
                     'Trop d\'inscriptions depuis cette connexion. Reessaie dans %d minute%s.',
                     $waitingMinutes,
                     $waitingMinutes > 1 ? 's' : ''
@@ -107,7 +107,7 @@ class RegistrationController extends AbstractController
         try {
             $this->emailVerifier->handleEmailConfirmation($request, $user);
         } catch (VerifyEmailExceptionInterface $exception) {
-            $this->addFlash('verify_email_error', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
+            $this->addFlash('danger', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
 
             return $this->redirectToRoute('app_register');
         }

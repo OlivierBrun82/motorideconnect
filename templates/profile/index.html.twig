@@ -3,13 +3,6 @@
 {% block title %}Mon profil{% endblock %}
 
 {% block body %}
-    {% for message in app.flashes('success') %}
-        <p>{{ message }}</p>
-    {% endfor %}
-    {% for message in app.flashes('error') %}
-        <p>{{ message }}</p>
-    {% endfor %}
-
     <h1>Mon profil</h1>
 
     {% if app.user.avatar %}
@@ -32,7 +25,7 @@
 
     {{ form_start(profileForm) }}
         {{ form_widget(profileForm) }}
-        <button type="submit">Enregistrer</button>
+        <button type="submit" class="btn btn-primary btn-block">Enregistrer</button>
     {{ form_end(profileForm) }}
 
     {# form separe, JAMAIS imbrique dans celui du profil : les forms HTML imbriques sont interdits #}

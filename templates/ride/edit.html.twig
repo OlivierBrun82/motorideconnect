@@ -7,7 +7,7 @@
 
         {{ form_start(form) }}
         {{ form_widget(form) }}
-        <button type="submit">Modifier</button> <br>
+        <button type="submit" class="btn btn-primary btn-block">Modifier</button> <br>
         {{ form_end(form) }}
         {% if ride.statut.value != 'canceled' and ride.meetingDatetime > date() %}
             <form method="post" action="{{ path('app_ride_cancel', {id: ride.id}) }}"

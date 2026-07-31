@@ -1,7 +1,8 @@
+{# Pastille de statut : le remplissage et la graisse portent l'etat, jamais la teinte #}
 {% if ride.statut.value == 'canceled' %}
-    Annulée
+    <span class="pill pill-canceled">Annulée</span>
 {% elseif ride.meetingDatetime < date() %}
-    Terminée
+    <span class="pill pill-completed">Terminée</span>
 {% else %}
-    {{ ride.statut.label }}
+    <span class="pill pill-{{ ride.statut.value }}">{{ ride.statut.label }}</span>
 {% endif %}

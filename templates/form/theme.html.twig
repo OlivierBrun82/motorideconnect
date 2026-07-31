@@ -1,0 +1,62 @@
+{# Theme de formulaire : label au-dessus, aide puis erreurs en dessous (charte section 4) #}
+{# Le use donne acces au bloc d'origine via parent() #}
+{% use 'form_div_layout.html.twig' %}
+
+{% block form_row %}
+    <div class="field">
+        {{ form_label(form) }}
+        {{ form_widget(form) }}
+        {{ form_help(form) }}
+        {{ form_errors(form) }}
+    </div>
+{% endblock %}
+
+{# La case a cocher precede son libelle, contrairement aux autres champs #}
+{% block checkbox_row %}
+    <div class="field field-check">
+        {{ form_widget(form) }}
+        {{ form_label(form) }}
+        {{ form_help(form) }}
+        {{ form_errors(form) }}
+    </div>
+{% endblock %}
+
+{# Le merge preserve les attributs deja poses par les form types (min, accept, autocomplete) #}
+{# Le champ cache est exclu : le jeton CSRF n'a pas a porter un style de saisie #}
+{% block form_widget_simple %}
+    {% if type|default('text') != 'hidden' %}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' input')|trim}) %}
+    {% endif %}
+    {{ parent() }}
+{% endblock %}
+
+{% block textarea_widget %}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' input')|trim}) %}
+    {{ parent() }}
+{% endblock %}
+
+{% block choice_widget_collapsed %}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' input')|trim}) %}
+    {{ parent() }}
+{% endblock %}
+
+{% block checkbox_widget %}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' checkbox')|trim}) %}
+    {{ parent() }}
+{% endblock %}
+
+{% block form_help %}
+    {% if help is not empty %}
+        <p id="{{ id }}_help" class="field-help">{{ help }}</p>
+    {% endif %}
+{% endblock %}
+
+{% block form_errors %}
+    {% if errors|length > 0 %}
+        <ul class="field-errors">
+            {% for error in errors %}
+                <li>{{ error.message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}

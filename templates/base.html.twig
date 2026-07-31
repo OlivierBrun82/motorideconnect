@@ -21,7 +21,8 @@
             <div data-turbo-temporary>
                 {% for label, messages in app.flashes %}
                     {% for message in messages %}
-                        <div class="flash-{{ label }}">{{ message }}</div>
+                        {# Une erreur est annoncee tout de suite, un succes attend une pause #}
+                        <div class="flash-{{ label }}" role="{{ label == 'danger' ? 'alert' : 'status' }}">{{ message }}</div>
                     {% endfor %}
                 {% endfor %}
             </div>

@@ -3,10 +3,6 @@
 {% block title %}Inscription{% endblock %}
 
 {% block body %}
-    {% for flash_error in app.flashes('verify_email_error') %}
-        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
-    {% endfor %}
-
     <h1>Inscription</h1>
 
     {{ form_errors(registrationForm) }}
@@ -22,6 +18,6 @@
         }) }}
         {{ form_row(registrationForm.agreeTerms) }}
 
-        <button type="submit" class="btn">créer un compte</button>
+        <button type="submit" class="btn btn-primary btn-block">Créer un compte</button>
     {{ form_end(registrationForm) }}
 {% endblock %}

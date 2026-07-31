@@ -27,5 +27,5 @@
 
 {% else %}
     {# Ni inscriptible ni inscrit : complète, annulée... #}
-    <p>Inscriptions fermées ({{ include('ride/_status.html.twig', {ride: ride}) }}).</p>
+    <p>Inscriptions fermées {{ include('ride/_status.html.twig', {ride: ride}) }}</p>
 {% endif %}
