@@ -64,9 +64,7 @@ final class ProfileController extends AbstractController
         ]);
     }
     
-    // ATTENTION : cette route doit rester declaree AVANT app_profile_id.
-    // /{id} n'a aucune contrainte, donc il capterait /profile/delete (id = "delete")
-    // et l'utilisateur tomberait sur un 404 au lieu de supprimer son compte.
+    // A declarer AVANT app_profile_id, sinon /{id} capte /profile/delete
     #[Route('/delete', name: 'app_profile_delete', methods: ['POST'])]
     public function delete(Request $request, AccountDeleter $accountDeleter, UserPasswordHasherInterface $hasher, Security $security) : Response
     {
@@ -89,8 +87,7 @@ final class ProfileController extends AbstractController
         // annule les balades a venir, desinscrit, puis anonymise
         $accountDeleter->delete($user);
 
-        // la session pointe encore une identite qui n'existe plus sous ce nom :
-        // false = pas de validation du token CSRF de logout, on a deja valide le notre
+        // false = pas de validation du CSRF de logout, le notre a deja ete valide
         $security->logout(false);
 
         // le flash APRES le logout : l'invalidation de session effacerait un flash pose avant

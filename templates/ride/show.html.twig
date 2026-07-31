@@ -70,8 +70,7 @@
                   onsubmit="return confirm('{{ confirmText|e('js') }}');">
                 <input type="hidden" name="_token" value="{{ csrf_token('delete_comment' ~ comment.id) }}">
                 {% if not isSelfDeletion %}
-                    {# motif obligatoire en moderation : il part en strike a l'auteur.
-                       l'id porte comment.id, sinon ids dupliques dans la boucle #}
+                    {# motif obligatoire en moderation : il part en strike a l'auteur #}
                     <label for="strike_reason_{{ comment.id }}">Motif de la suppression</label>
                     <textarea id="strike_reason_{{ comment.id }}" name="reason" rows="2" required minlength="10" maxlength="500"></textarea>
                 {% endif %}
