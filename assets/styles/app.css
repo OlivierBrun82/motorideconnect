@@ -1,3 +1,148 @@
+/* Tokens de la charte : voir Documentations/DESIGN.md */
+:root {
+    /* Couleurs : une seule teinte d'accent dans tout le systeme */
+    --color-canvas: #F6F6F7;
+    --color-surface: #FFFFFF;
+    --color-ink: #1C1C1E;
+    --color-steel: #6B7280;
+    --color-accent: #475569;
+    --color-hairline: rgba(28, 28, 30, 0.08);
+
+    /* Familles : Space Grotesk titres, Outfit texte, JetBrains Mono chiffres */
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Outfit', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Echelle d'espacement, base 4px */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+    --space-7: 3rem;
+
+    /* Rayons : 12px controles, 16px cartes */
+    --radius-control: 12px;
+    --radius-card: 16px;
+    --radius-pill: 999px;
+
+    /* Largeur de colonne unique, cible mobile 390px */
+    --page-width: 430px;
+
+    /* Cible tactile minimale imposee par la charte */
+    --tap-target: 44px;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 body {
-    background-color: skyblue;
+    margin: 0;
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
+}
+
+/* Colonne unique centree : le gabarit de tous les ecrans */
+.page {
+    max-width: var(--page-width);
+    margin-inline: auto;
+    padding: var(--space-4);
+}
+
+h1,
+h2,
+h3 {
+    margin: 0 0 var(--space-3);
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+h1 {
+    font-size: clamp(1.5rem, 1.2rem + 1.5vw, 1.875rem);
+}
+
+h2 {
+    font-size: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+}
+
+h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+p {
+    margin: 0 0 var(--space-3);
+    max-width: 60ch;
+}
+
+/* Texte secondaire : metadonnees, aide, horodatages */
+.text-muted {
+    color: var(--color-steel);
+}
+
+/* Chiffres et donnees techniques uniquement : dates, heures, cylindrees, compteurs */
+.mono {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Libelle de tuile : petites capitales en mono, comme sur la maquette */
+.tile-label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-steel);
+}
+
+a {
+    color: var(--color-ink);
+    text-decoration-color: var(--color-hairline);
+    text-underline-offset: 0.2em;
+}
+
+a:hover {
+    text-decoration-color: currentColor;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid var(--color-hairline);
+    margin: var(--space-5) 0;
+}
+
+/* Anneau de focus : l'un des trois seuls usages autorises de l'accent */
+:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+/* La charte plafonne le mouvement : on le coupe si l'utilisateur le demande */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }
