@@ -55,9 +55,22 @@ final class RideController extends AbstractController
         $page = $request->query->getInt('page', 1);
         $pagination = $paginator->paginate($rides, $page);
 
+        // Nombre de balades par organisateur, indexe par id d'organisateur.
+        // Construit APRES la pagination : seules les balades affichees comptent,
+        // soit 5 organisateurs au maximum. Le ??= evite de recompter deux fois
+        // le meme membre s'il organise plusieurs balades de la page.
+        // Le tableau est bati depuis ces memes balades, donc aucune cle ne peut
+        // manquer cote Twig, y compris pour un organisateur a zero balade active.
+        $organizerRideCounts = [];
+        foreach ($pagination->items as $ride) {
+            $organizerId = $ride->getUser()->getId();
+            $organizerRideCounts[$organizerId] ??= $rideRepository->countByOrganizer($ride->getUser());
+        }
+
         return $this->render('ride/index.html.twig', [
             'form' => $form,
             'pagination' => $pagination,
+            'organizerRideCounts' => $organizerRideCounts,
         ]);
     }
 
@@ -110,7 +123,7 @@ final class RideController extends AbstractController
     }
 
     #[Route('/show/{id}', name: 'app_ride_show', methods:['GET', 'POST'])]
-        public function show(Ride $ride, Request $request, EntityManagerInterface $em, RideDuration $rideDuration) : Response
+        public function show(Ride $ride, Request $request, EntityManagerInterface $em, RideDuration $rideDuration, RideRepository $rideRepository) : Response
         {
             // construction du formulaire de commentaire (Comment vierge, rempli par le form)
             $comment = new Comment();
@@ -144,6 +157,8 @@ final class RideController extends AbstractController
                 'ride' => $ride,
                 'form' => $form,
                 'duration' => $rideDuration->format($ride),
+                // indicateur de fiabilite de l'organisateur (annulations exclues)
+                'organizerRideCount' => $rideRepository->countByOrganizer($ride->getUser()),
             ]);
 
         }
