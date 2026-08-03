@@ -2,32 +2,49 @@
 
 {% block title %}Connexion{% endblock %}
 
+{# Pas de barre haute sur les ecrans d'auth : la marque la remplace #}
+{% block header %}{% endblock %}
+
 {% block body %}
-    <h1>Connexion</h1>
+    <div class="auth">
+        <p class="auth-brand">MotoRide-Connect</p>
 
-    {% if error %}
-        <div class="flash-danger" role="alert">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
+        <h1>Connexion</h1>
 
-    {% if app.user %}
-        <p>Tu es connecté en tant que {{ app.user.userIdentifier }}, <a href="{{ logout_path() }}">Déconnexion</a></p>
-    {% endif %}
+        {% if error %}
+            <div class="flash-danger" role="alert">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        {% endif %}
 
-    <form method="post">
-        <div class="field">
-            <label for="username">Adresse email</label>
-            <input type="email" value="{{ last_username }}" name="_username" id="username" class="input" autocomplete="email" required autofocus>
-        </div>
+        {% if app.user %}
+            <p class="text-muted">
+                Tu es connecté en tant que {{ app.user.userIdentifier }}.
+                <a href="{{ logout_path() }}">Déconnexion</a>
+            </p>
+        {% endif %}
 
-        <div class="field">
-            <label for="password">Mot de passe</label>
-            <input type="password" name="_password" id="password" class="input" minlength="8" autocomplete="current-password" required>
-        </div>
+        <form method="post">
+            <div class="field">
+                <label for="username">Adresse email</label>
+                <input type="email" value="{{ last_username }}" name="_username" id="username" class="input" autocomplete="email" required autofocus>
+            </div>
 
-        <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+            <div class="field">
+                <label for="password">Mot de passe</label>
+                <input type="password" name="_password" id="password" class="input" minlength="8" autocomplete="current-password" required>
+            </div>
 
-        <button class="btn btn-primary btn-block" type="submit">
-            Se connecter
-        </button>
-    </form>
+            <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+
+            <button class="btn btn-primary btn-block" type="submit">
+                Se connecter
+            </button>
+        </form>
+
+        <p class="auth-foot">
+            Pas encore de compte ? <a href="{{ path('app_register') }}">Créer un compte</a>
+        </p>
+        <p class="auth-foot text-muted">
+            <a href="{{ path('app_legal') }}">Mentions légales</a>
+        </p>
+    </div>
 {% endblock %}
