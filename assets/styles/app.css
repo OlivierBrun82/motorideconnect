@@ -880,6 +880,16 @@ a.card-organizer:hover {
     border-top: 1px solid var(--color-hairline);
 }
 
+/* Dans une carte, la zone de moderation est le dernier bloc : pas de marge en trop */
+.card .mod-zone {
+    margin-bottom: 0;
+}
+
+/* Bannissement imbrique dans la moderation : la marge de detachement se resserre */
+.mod-zone .danger-zone {
+    margin-top: var(--space-4);
+}
+
 /* Commentaire : un bloc par message, separes par un filet */
 .comment {
     padding: var(--space-3) 0;
