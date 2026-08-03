@@ -93,6 +93,11 @@ p {
     color: var(--color-steel);
 }
 
+/* Sinon la regle a { color: ink } rend le lien plus fort que son paragraphe */
+.text-muted a {
+    color: inherit;
+}
+
 /* Chiffres et donnees techniques uniquement : dates, heures, cylindrees, compteurs */
 .mono {
     font-family: var(--font-mono);
@@ -667,6 +672,26 @@ hr {
     display: block;
 }
 
+/* Les deux blocs organisateur menent au profil public : pas de soulignement dessus */
+a.organizer,
+a.card-organizer {
+    text-decoration: none;
+}
+
+/* Le survol se marque sur le contenant, pas sur le texte */
+a.organizer:hover {
+    border-color: var(--color-steel);
+}
+
+a.card-organizer:hover {
+    color: var(--color-ink);
+}
+
+/* Sur le profil public, le pseudo est le h1 de la page et vit dans cette carte */
+.organizer h1 {
+    margin: 0;
+}
+
 .organizer-name {
     font-family: var(--font-display);
     font-size: 1.125rem;
@@ -921,6 +946,40 @@ hr {
     border-left: 3px solid var(--color-ink);
     font-size: 0.875rem;
     font-weight: 500;
+}
+
+/* Ecran d'authentification : ni barre haute ni barre d'onglets, colonne centree */
+.auth {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 80vh;
+    padding: var(--space-6) 0;
+}
+
+/* La marque remplace la barre haute retiree sur ces deux ecrans */
+.auth-brand {
+    margin-bottom: var(--space-6);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-align: center;
+}
+
+.auth h1 {
+    text-align: center;
+}
+
+/* Bascule vers l'autre parcours, puis mentions legales */
+.auth-foot {
+    margin: var(--space-5) 0 0;
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+.auth-foot + .auth-foot {
+    margin-top: var(--space-3);
 }
 
 /* La charte plafonne le mouvement : on le coupe si l'utilisateur le demande */

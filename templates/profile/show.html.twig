@@ -1,28 +1,66 @@
 {% extends 'base.html.twig' %}
+{% import '_icons.html.twig' as icon %}
 
 {% block title %}Profil de {{ user.pseudo }}{% endblock %}
 
-{% block body %}
-    <h1>{{ user.pseudo }}</h1>
+{% block header %}
+    {{ include('_header.html.twig', {
+        title: user.pseudo,
+        back: path('app_ride')
+    }, with_context = false) }}
+{% endblock %}
 
-    {% if user.avatar %}
-        <img src="{{ asset('uploads/avatars/' ~ user.avatar) }}" alt="avatar de {{ user.pseudo }}">
+{% block body %}
+    <div class="organizer">
+        <span class="avatar avatar-lg">
+            {% if user.avatar %}
+                <img src="{{ asset('uploads/avatars/' ~ user.avatar) }}" alt="">
+            {% else %}
+                {{ icon.user() }}
+            {% endif %}
+        </span>
+        <div class="organizer-info">
+            <h1 class="organizer-name">{{ user.pseudo }}</h1>
+            {# La collection rides est celle des balades ORGANISEES : aucun PHP a ecrire #}
+            <span><span class="mono">{{ user.rides|length }}</span> balade{{ user.rides|length > 1 ? 's' }} organisée{{ user.rides|length > 1 ? 's' }}</span>
+        </div>
+    </div>
+
+    {% if user.driverLvl %}
+        <div class="chip-row">
+            <span class="chip">{{ user.driverLvl.label }}</span>
+        </div>
     {% endif %}
 
     {% if user.about %}
-    <p>{{ user.about }}</p>
+        <h2>À propos</h2>
+        <p>{{ user.about }}</p>
     {% endif %}
 
-    {% if user.driverLvl %}
-    <p>Niveau : {{ user.driverLvl.label }}</p>
-    {% endif %}
+    <div class="section-head">
+        <h2>Motos</h2>
+        <span class="mono">{{ user.motorcycles|length }}</span>
+    </div>
 
-    <h2>Motos</h2>
-    <ul>
-        {% for moto in user.motorcycles %}
-            <li>{{ moto.brand.name }} — {{ moto.type.label }} ({{ moto.displacement }} cm³)</li>
-        {% else %}
-            <li>Aucune moto renseignée</li>
-        {% endfor %}
-    </ul>
+    {% for moto in user.motorcycles %}
+        <article class="card">
+            <h2>{{ moto.brand ? moto.brand.name : 'Moto' }}</h2>
+            <p class="card-route">{{ moto.type.label }}</p>
+            <div class="tile-row">
+                <div class="tile">
+                    <span class="tile-label">Cylindrée</span>
+                    <p class="tile-value mono">{{ moto.displacement }} cm³</p>
+                </div>
+                <div class="tile">
+                    <span class="tile-label">Autonomie</span>
+                    <p class="tile-value mono">{{ moto.autonomy ? moto.autonomy ~ ' km' : '--' }}</p>
+                </div>
+            </div>
+        </article>
+    {% else %}
+        <div class="empty-state">
+            {{ icon.motorcycle() }}
+            <p>Aucune moto renseignée.</p>
+        </div>
+    {% endfor %}
 {% endblock %}

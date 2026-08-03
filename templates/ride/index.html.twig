@@ -45,7 +45,8 @@
 
             <p class="card-route">{{ ride.meetingPlace }}{% if ride.endPoint %} → {{ ride.endPoint }}{% endif %}</p>
 
-            <p class="card-organizer">
+            {# Second lien de la carte, frere du titre : jamais imbrique dedans #}
+            <a class="card-organizer" href="{{ path('app_profile_id', {id: ride.user.id}) }}">
                 <span class="avatar avatar-sm">
                     {% if ride.user.avatar %}
                         <img src="{{ asset('uploads/avatars/' ~ ride.user.avatar) }}" alt="">
@@ -55,7 +56,7 @@
                 </span>
                 Organisé par {{ ride.user.pseudo }}
                 <span class="mono">({{ organizerRideCounts[ride.user.id] }})</span>
-            </p>
+            </a>
 
             <div class="tile-row">
                 <div class="tile">

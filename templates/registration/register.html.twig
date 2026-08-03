@@ -2,22 +2,36 @@
 
 {% block title %}Inscription{% endblock %}
 
+{# Pas de barre haute sur les ecrans d'auth : la marque la remplace #}
+{% block header %}{% endblock %}
+
 {% block body %}
-    <h1>Inscription</h1>
+    <div class="auth">
+        <p class="auth-brand">MotoRide-Connect</p>
 
-    {{ form_errors(registrationForm) }}
+        <h1>Inscription</h1>
 
-    {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.pseudo) }}
-        {{ form_row(registrationForm.birthdate) }}
-        {{ form_row(registrationForm.phoneNumber) }}
-        {{ form_row(registrationForm.driverLvl) }}
-        {{ form_row(registrationForm.plainPassword, {
-            label: 'Mot de passe'
-        }) }}
-        {{ form_row(registrationForm.agreeTerms) }}
+        {{ form_errors(registrationForm) }}
 
-        <button type="submit" class="btn btn-primary btn-block">Créer un compte</button>
-    {{ form_end(registrationForm) }}
+        {{ form_start(registrationForm) }}
+            {{ form_row(registrationForm.email) }}
+            {{ form_row(registrationForm.pseudo) }}
+            {{ form_row(registrationForm.birthdate) }}
+            {{ form_row(registrationForm.phoneNumber) }}
+            {{ form_row(registrationForm.driverLvl) }}
+            {{ form_row(registrationForm.plainPassword, {
+                label: 'Mot de passe'
+            }) }}
+            {{ form_row(registrationForm.agreeTerms) }}
+
+            <button type="submit" class="btn btn-primary btn-block">Créer un compte</button>
+        {{ form_end(registrationForm) }}
+
+        <p class="auth-foot">
+            Déjà inscrit ? <a href="{{ path('app_login') }}">Se connecter</a>
+        </p>
+        <p class="auth-foot text-muted">
+            <a href="{{ path('app_legal') }}">Mentions légales</a>
+        </p>
+    </div>
 {% endblock %}

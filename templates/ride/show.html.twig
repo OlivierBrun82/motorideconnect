@@ -22,7 +22,8 @@
         {{ include('ride/_like.html.twig', {ride: ride}) }}
     </div>
 
-    <div class="organizer">
+    {# Toute la carte mene au profil public : la cible tactile depasse largement 44px #}
+    <a class="organizer" href="{{ path('app_profile_id', {id: ride.user.id}) }}">
         <span class="avatar avatar-lg">
             {% if ride.user.avatar %}
                 <img src="{{ asset('uploads/avatars/' ~ ride.user.avatar) }}" alt="">
@@ -35,7 +36,7 @@
             <span class="organizer-name">{{ ride.user.pseudo }}</span>
             <span class="text-muted">{{ organizerRideCount }} balade{{ organizerRideCount > 1 ? 's' }} organisée{{ organizerRideCount > 1 ? 's' }}</span>
         </span>
-    </div>
+    </a>
 
     <div class="chip-row">
         <span class="chip">{{ ride.rideType.label }}</span>
