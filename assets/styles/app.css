@@ -1045,6 +1045,48 @@ a.card-organizer:hover {
     margin-top: var(--space-3);
 }
 
+/* Accueil anonyme : presentation et inscription, aucune balade affichee */
+.hero {
+    padding: var(--space-6) 0 var(--space-5);
+    text-align: center;
+}
+
+/* Le pitch reste centre : max-width: 60ch sur p le decalerait a gauche */
+.hero-pitch {
+    margin: 0 auto var(--space-6);
+    color: var(--color-steel);
+}
+
+.hero .btn + .btn {
+    margin-top: var(--space-3);
+}
+
+/* Trois arguments sous les CTA : icone a gauche, phrase a droite */
+.hero-points {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.hero-points li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-hairline);
+    color: var(--color-steel);
+}
+
+.hero-points .icon {
+    flex: none;
+    color: var(--color-ink);
+}
+
+/* Lien d'en-tete de section : secondaire, il ne doit pas concurrencer le titre */
+.section-head a {
+    font-size: 0.875rem;
+}
+
 /* La charte plafonne le mouvement : on le coupe si l'utilisateur le demande */
 @media (prefers-reduced-motion: reduce) {
     *,
