@@ -1,58 +1,24 @@
-{# Icones au trait sur grille 24x24, style commun dans .icon (app.css) #}
+{# Icones FontAwesome 6 Free, rendues en SVG inline par symfony/ux-icons #}
+{# Importees en local dans assets/icons : aucune requete sortante au runtime #}
+{# La couche macro est conservee : les appels {{ icon.home() }} des templates ne changent pas #}
 
-{% macro home() %}
-    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M3 10.5 L12 3 L21 10.5 V20 H3 Z"/>
-        <path d="M9.5 20 V14 H14.5 V20"/>
-    </svg>
-{% endmacro %}
+{% macro home() %}{{ ux_icon('fa6-solid:house', {class: 'icon', 'aria-hidden': 'true'}) }}{% endmacro %}
 
-{% macro plusCircle() %}
-    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="12" cy="12" r="8.5"/>
-        <path d="M12 8 V16 M8 12 H16"/>
-    </svg>
-{% endmacro %}
+{% macro plusCircle() %}{{ ux_icon('fa6-solid:circle-plus', {class: 'icon', 'aria-hidden': 'true'}) }}{% endmacro %}
 
-{% macro magnifier() %}
-    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="10.5" cy="10.5" r="6.5"/>
-        <path d="M15.5 15.5 L21 21"/>
-    </svg>
-{% endmacro %}
+{% macro magnifier() %}{{ ux_icon('fa6-solid:magnifying-glass', {class: 'icon', 'aria-hidden': 'true'}) }}{% endmacro %}
 
-{% macro user() %}
-    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="12" cy="8" r="3.5"/>
-        <path d="M4.5 20 C4.5 16.5 7.8 14.5 12 14.5 C16.2 14.5 19.5 16.5 19.5 20"/>
-    </svg>
-{% endmacro %}
+{% macro user() %}{{ ux_icon('fa6-solid:user', {class: 'icon', 'aria-hidden': 'true'}) }}{% endmacro %}
 
-{% macro arrowLeft() %}
-    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M20 12 H5"/>
-        <path d="M11 6 L5 12 L11 18"/>
-    </svg>
-{% endmacro %}
+{% macro arrowLeft() %}{{ ux_icon('fa6-solid:arrow-left', {class: 'icon', 'aria-hidden': 'true'}) }}{% endmacro %}
 
-{% macro burger() %}
-    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M4 7 H20 M4 12 H20 M4 17 H20"/>
-    </svg>
-{% endmacro %}
+{% macro burger() %}{{ ux_icon('fa6-solid:bars', {class: 'icon', 'aria-hidden': 'true'}) }}{% endmacro %}
 
-{# Deux lobes en arc, deux flancs en courbe : le remplissage porte l'etat du like #}
-{% macro heart() %}
-    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 20.3 C6.5 15.6 3 12.6 3 9.4 A4.4 4.4 0 0 1 12 7.4 A4.4 4.4 0 0 1 21 9.4 C21 12.6 17.5 15.6 12 20.3 Z"/>
-    </svg>
-{% endmacro %}
+{# Crayon : action Modifier dans la barre haute de la fiche balade #}
+{% macro pencil() %}{{ ux_icon('fa6-solid:pen', {class: 'icon', 'aria-hidden': 'true'}) }}{% endmacro %}
 
-{# Roue a rayons : illustration des etats vides, format 64px via .icon-large #}
-{% macro wheel() %}
-    <svg class="icon-large" viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="12" cy="12" r="9"/>
-        <circle cx="12" cy="12" r="2.5"/>
-        <path d="M12 3 V9.5 M12 14.5 V21 M3 12 H9.5 M14.5 12 H21"/>
-    </svg>
-{% endmacro %}
+{# Le remplissage est le seul signal d'etat du like : contour si non aime, plein sinon #}
+{% macro heart(filled = false) %}{{ ux_icon(filled ? 'fa6-solid:heart' : 'fa6-regular:heart', {class: 'icon', 'aria-hidden': 'true'}) }}{% endmacro %}
+
+{# Moto : illustration des etats vides, format 64px via .icon-large #}
+{% macro motorcycle() %}{{ ux_icon('fa6-solid:motorcycle', {class: 'icon-large', 'aria-hidden': 'true'}) }}{% endmacro %}

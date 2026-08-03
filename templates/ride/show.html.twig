@@ -1,99 +1,189 @@
 {% extends 'base.html.twig' %}
+{% import '_icons.html.twig' as icon %}
 
-{% block title %} {{ ride.name }} {% endblock %}
+{% block title %}{{ ride.name }}{% endblock %}
+
+{% block header %}
+    {{ include('_header.html.twig', {
+        title: ride.name,
+        back: path('app_ride'),
+        edit: (ride.user == app.user or is_granted('ROLE_ADMIN')) ? path('app_ride_edit', {id: ride.id}) : null,
+        editLabel: 'Modifier la balade'
+    }, with_context = false) }}
+{% endblock %}
 
 {% block body %}
-    <h1>{{ ride.name }}</h1> <br>
+    {# Code -> nom du departement : la table est un const public, aucun PHP a ecrire #}
+    {% set departments = constant('App\\Data\\FrenchDepartments::CODES') %}
+    {% set moderables = ride.participants|filter(p => p != app.user and 'ROLE_ADMIN' not in p.roles) %}
 
-    Organisateur : {{ ride.user.pseudo }} ({{ organizerRideCount }} balade{{ organizerRideCount > 1 ? 's' }} organisée{{ organizerRideCount > 1 ? 's' }}) <br>
-    {{ include('ride/_status.html.twig', {ride: ride}) }} <br>
-    Nombre d'inscrit : {{ ride.participants|length}} <br>
-    Places restantes : {{ ride.capacity - (ride.participants|length) }} / {{ ride.capacity }} <br>
-    Description : <p>{{ ride.descriptionMessage}}</p> <br>
-    Lieu de RDV : {{ ride.meetingPlace}} <br>
-    Date : {{ ride.meetingDatetime|date('d/m/Y H:i')}} <br>
-    {% if duration %}
-        Durée estimée : {{ duration }} <br>
+    <div class="ride-title-row">
+        <h1>{{ ride.name }}</h1>
+        {{ include('ride/_like.html.twig', {ride: ride}) }}
+    </div>
+
+    <div class="organizer">
+        <span class="avatar avatar-lg">
+            {% if ride.user.avatar %}
+                <img src="{{ asset('uploads/avatars/' ~ ride.user.avatar) }}" alt="">
+            {% else %}
+                {{ icon.user() }}
+            {% endif %}
+        </span>
+        <span class="organizer-info">
+            <span class="tile-label">Organisateur</span>
+            <span class="organizer-name">{{ ride.user.pseudo }}</span>
+            <span class="text-muted">{{ organizerRideCount }} balade{{ organizerRideCount > 1 ? 's' }} organisée{{ organizerRideCount > 1 ? 's' }}</span>
+        </span>
+    </div>
+
+    <div class="chip-row">
+        <span class="chip">{{ ride.rideType.label }}</span>
+        <span class="chip">{{ ride.pilotLevel.label }}</span>
+        <span class="chip"><span class="mono">{{ ride.participants|length }}/{{ ride.capacity }}</span>&nbsp;participants</span>
+        {{ include('ride/_status.html.twig', {ride: ride}) }}
+    </div>
+
+    <div class="tile-grid">
+        <div class="tile">
+            <span class="tile-label">Date</span>
+            <p class="tile-value">{{ ride.meetingDatetime|date('d/m/Y') }}</p>
+        </div>
+        <div class="tile">
+            <span class="tile-label">Heure RDV</span>
+            <p class="tile-value">{{ ride.meetingDatetime|date('H:i') }}</p>
+        </div>
+        <div class="tile">
+            <span class="tile-label">Départ</span>
+            <p class="tile-value">{{ ride.startTime ? ride.startTime|date('H:i') : '--' }}</p>
+        </div>
+        <div class="tile">
+            <span class="tile-label">Arrivée est.</span>
+            <p class="tile-value">{{ ride.endTime ? ride.endTime|date('H:i') : '--' }}</p>
+        </div>
+        {% if duration %}
+            <div class="tile">
+                <span class="tile-label">Durée</span>
+                <p class="tile-value">{{ duration }}</p>
+            </div>
+        {% endif %}
+        {% if ride.distanceKm %}
+            <div class="tile">
+                <span class="tile-label">Kilométrage</span>
+                <p class="tile-value">{{ ride.distanceKm }} km</p>
+            </div>
+        {% endif %}
+        <div class="tile tile-wide">
+            <span class="tile-label">Itinéraire</span>
+            <p class="tile-value">{{ ride.meetingPlace }}{% if ride.endPoint %} → {{ ride.endPoint }}{% endif %}</p>
+            <p class="tile-sub"><span class="mono">{{ ride.departmentCode }}</span> {{ departments[ride.departmentCode] ?? '' }}</p>
+        </div>
+    </div>
+
+    <h2>À propos</h2>
+    <p>{{ ride.descriptionMessage }}</p>
+
+    <h2>Motos engagées</h2>
+    <ul class="plain-list">
+        {% for moto in ride.motorcycles %}
+            <li>{{ moto.user.pseudo }} — <span class="mono">{{ moto.brand.name ?? '' }} {{ moto.type.label }} ({{ moto.displacement }} cm³)</span></li>
+        {% else %}
+            <li class="text-muted">Aucune moto engagée pour l'instant.</li>
+        {% endfor %}
+    </ul>
+
+    <div class="section-head">
+        <h2>Participants</h2>
+        <span class="mono text-muted">{{ ride.participants|length }} / {{ ride.capacity }}</span>
+    </div>
+
+    <ul class="participant-row">
+        {% for participant in ride.participants %}
+            <li class="participant">
+                <a href="{{ path('app_profile_id', {id: participant.id}) }}">
+                    <span class="avatar">
+                        {% if participant.avatar %}
+                            <img src="{{ asset('uploads/avatars/' ~ participant.avatar) }}" alt="">
+                        {% else %}
+                            {{ icon.user() }}
+                        {% endif %}
+                    </span>
+                    <span class="participant-name">{{ participant.pseudo }}</span>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    {% if ride.user == app.user and moderables|length > 0 %}
+        <details class="mod-zone">
+            <summary>Modérer les participants</summary>
+            <ul class="plain-list">
+                {% for participant in moderables %}
+                    <li>
+                        <p class="comment-author">{{ participant.pseudo }}</p>
+                        <form method="post" action="{{ path('app_ride_strike', {ride: ride.id, user: participant.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('strike_participant' ~ participant.id) }}">
+                            <div class="field">
+                                <label for="strike_{{ participant.id }}">Motif de l'avertissement</label>
+                                <input class="input" type="text" id="strike_{{ participant.id }}" name="reason" required>
+                            </div>
+                            <button type="submit" class="btn btn-quiet">Avertir</button>
+                        </form>
+                        <form method="post" action="{{ path('app_ride_exclude', {ride: ride.id, user: participant.id}) }}"
+                              onsubmit="return confirm('Exclure ce participant ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('exclude_participant' ~ participant.id) }}">
+                            <button type="submit" class="btn btn-quiet">Exclure</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+        </details>
     {% endif %}
-    Rhytme : {{ride.rideType.label}} <br>
-    Niveau Conseillé: {{ride.pilotLevel.label}} <br>
-    {% for moto in ride.motorcycles %}
-        Moto de {{ moto.user.pseudo }} : {{ moto.brand.name ?? '' }} {{ moto.type.label }} ({{ moto.displacement }} cm³){% if not loop.last %}, {% endif %}
-    {% else %}
-        Aucune
-    {% endfor %}
-    <br>
-    
-    {{ include('ride/_participation.html.twig', {ride: ride}) }}
-    {{ include('ride/_like.html.twig', {ride: ride}) }}
 
-<h2>Participants</h2>
-<ul>
-    {% for participant in ride.participants %}
-        <li>
-            {{ participant.pseudo }}
-            {% if ride.user == app.user and participant != app.user and 'ROLE_ADMIN' not in participant.roles %}
-                {# Strike (motif obligatoire) #}
-                <form method="post" action="{{ path('app_ride_strike', {ride: ride.id, user: participant.id}) }}">
-                    <input type="hidden" name="_token" value="{{ csrf_token('strike_participant' ~ participant.id) }}">
-                    <input type="text" name="reason" placeholder="Motif" required>
-                    <button type="submit">Strike</button>
-                </form>
-                {# Exclure #}
-                <form method="post" action="{{ path('app_ride_exclude', {ride: ride.id, user: participant.id}) }}"
-                      onsubmit="return confirm('Exclure ce participant ?');">
-                    <input type="hidden" name="_token" value="{{ csrf_token('exclude_participant' ~ participant.id) }}">
-                    <button type="submit">Exclure</button>
+    {{ include('ride/_participation.html.twig', {ride: ride}) }}
+
+    <h2>Commentaires</h2>
+
+    {% for comment in ride.comments %}
+        <div class="comment">
+            <div class="comment-head">
+                <span class="comment-author">{{ comment.user.pseudo }}</span>
+                <span class="mono text-muted">{{ comment.createdAt|date('d/m/Y H:i') }}</span>
+            </div>
+            <p>{{ comment.message }}</p>
+
+            {# bouton supprimer : auteur OU organisateur de la balade #}
+            {% if comment.user == app.user or ride.user == app.user or is_granted('ROLE_ADMIN') %}
+                {# retrait volontaire par l'auteur, ou acte de moderation sur le message d'un autre #}
+                {% set isSelfDeletion = comment.user == app.user %}
+                {% set confirmText = isSelfDeletion
+                    ? 'Supprimer ton commentaire ?'
+                    : 'Supprimer ce message et donner un avertissement a son auteur ?' %}
+
+                <form method="post" action="{{ path('app_comment_delete', {id: comment.id}) }}"
+                      onsubmit="return confirm('{{ confirmText|e('js') }}');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete_comment' ~ comment.id) }}">
+                    {% if not isSelfDeletion %}
+                        {# motif obligatoire en moderation : il part en strike a l'auteur #}
+                        <div class="field">
+                            <label for="strike_reason_{{ comment.id }}">Motif de la suppression</label>
+                            <textarea class="input" id="strike_reason_{{ comment.id }}" name="reason" rows="2" required minlength="10" maxlength="500"></textarea>
+                        </div>
+                    {% endif %}
+                    <button type="submit" class="btn btn-quiet">Supprimer</button>
                 </form>
             {% endif %}
-        </li>
+        </div>
+    {% else %}
+        <p class="text-muted">Aucun commentaire pour l'instant.</p>
     {% endfor %}
-</ul>
 
-<h2>Commentaires</h2>
-
-{% for comment in ride.comments %}
-    <div>
-        <strong>{{ comment.user.pseudo }}</strong>
-        <em>{{ comment.createdAt|date('d/m/Y H:i') }}</em>
-        <p>{{ comment.message }}</p>
-
-        {# bouton supprimer : auteur OU organisateur de la balade #}
-        {% if comment.user == app.user or ride.user == app.user or is_granted('ROLE_ADMIN') %}
-            {# retrait volontaire par l'auteur, ou acte de moderation sur le message d'un autre #}
-            {% set isSelfDeletion = comment.user == app.user %}
-            {% set confirmText = isSelfDeletion
-                ? 'Supprimer ton commentaire ?'
-                : 'Supprimer ce message et donner un avertissement a son auteur ?' %}
-
-            <form method="post" action="{{ path('app_comment_delete', {id: comment.id}) }}"
-                  onsubmit="return confirm('{{ confirmText|e('js') }}');">
-                <input type="hidden" name="_token" value="{{ csrf_token('delete_comment' ~ comment.id) }}">
-                {% if not isSelfDeletion %}
-                    {# motif obligatoire en moderation : il part en strike a l'auteur #}
-                    <label for="strike_reason_{{ comment.id }}">Motif de la suppression</label>
-                    <textarea id="strike_reason_{{ comment.id }}" name="reason" rows="2" required minlength="10" maxlength="500"></textarea>
-                {% endif %}
-                <button type="submit">Supprimer</button>
-            </form>
-        {% endif %}
-    </div>
-{% else %}
-    <p>Aucun commentaire pour l'instant.</p>
-{% endfor %}
-
-{% if ride.participants.contains(app.user)
-      and ride.statut.value != 'canceled'
-      and ride.meetingDatetime > date() %}
-    {{ form_start(form) }}
-        {{ form_widget(form) }}
-        <button type="submit" class="btn btn-secondary">Publier</button>
-    {{ form_end(form) }}
-{% endif %}
-    
-    {% if ride.user == app.user or is_granted('ROLE_ADMIN') %}
-        <a href="{{ path('app_ride_edit', {id: ride.id}) }}">Gérer la balade</a> <br>
+    {% if ride.participants.contains(app.user)
+          and ride.statut.value != 'canceled'
+          and ride.meetingDatetime > date() %}
+        {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <button type="submit" class="btn btn-secondary btn-block">Publier</button>
+        {{ form_end(form) }}
     {% endif %}
-
-    <a href="{{ path('app_home') }}">Accueil</a>
 {% endblock %}

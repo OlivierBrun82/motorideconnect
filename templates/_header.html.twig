@@ -3,6 +3,8 @@
 
 {% set title = title|default('MotoRide-Connect') %}
 {% set back = back|default(null) %}
+{% set edit = edit|default(null) %}
+{% set editLabel = editLabel|default('Modifier') %}
 
 <header class="topbar">
     {% if back %}
@@ -39,6 +41,9 @@
                 {{ icon.user() }}
             {% endif %}
         </a>
+    {% elseif edit %}
+        {# Slot d'action droite, laisse vide en D2 faute de bouton partage sans JS #}
+        <a href="{{ edit }}" class="topbar-action" aria-label="{{ editLabel }}">{{ icon.pencil() }}</a>
     {% else %}
         {# Espaceur : maintient le titre centre quand il n'y a pas d'action a droite #}
         <span class="topbar-action" aria-hidden="true"></span>
