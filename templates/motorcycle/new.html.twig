@@ -2,11 +2,18 @@
 
 {% block title %}Ajouter une moto{% endblock %}
 
+{% block header %}
+    {{ include('_header.html.twig', {
+        title: 'Ajouter une moto',
+        back: path('app_motorcycle')
+    }, with_context = false) }}
+{% endblock %}
+
 {% block body %}
     <h1>Ajouter une moto</h1>
 
     {{ form_start(form) }}
-        {{ form_widget(form) }}
-        <button type="submit" class="btn btn-primary btn-block">Ajouter</button>
+    {{ form_widget(form) }}
+    <button type="submit" class="btn btn-primary btn-block">Ajouter</button>
     {{ form_end(form) }}
 {% endblock %}
