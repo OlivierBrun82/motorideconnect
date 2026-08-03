@@ -1,81 +1,152 @@
 {% extends 'base.html.twig' %}
+{% import '_icons.html.twig' as icon %}
 
 {% block title %}Administration{% endblock %}
 
+{# Back-office : pas de barre d'onglets (charte section 5), le menu suffit a en sortir #}
+{% block footer %}{% endblock %}
+
 {% block body %}
-    <h1>Modération des membres</h1>
+    <h1>Administration</h1>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Pseudo</th><th>Email</th><th>Strikes</th><th>Statut</th><th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for user in users %}
-            <tr>
-                <td>{{ user.pseudo }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.strikes|length }}</td>
-                <td>{{ user.bannedDate ? 'Banni' : 'Actif' }}</td>
-                <td>
-                    {% if user == app.user %}
-                        <em>C'est toi</em>
+    {# Le tableau a 5 colonnes ne tient pas dans 390px, et le scroll horizontal est interdit #}
+    {# hors chip strips (section 6) : une carte par membre, empilees #}
+    <div class="section-head">
+        <h2>Membres</h2>
+        <span class="mono">{{ users|length }}</span>
+    </div>
+
+    {% for user in users %}
+        <article class="card{{ user.bannedDate ? ' card-muted' }}">
+            <div class="card-head">
+                <span class="card-head-left">
+                    {% if user.bannedDate %}
+                        <span class="pill pill-canceled">Banni</span>
                     {% else %}
-                        {# Infliger un strike (avec motif) #}
-                        <form method="post" action="{{ path('app_admin_strike', {id: user.id}) }}">
-                            <input type="hidden" name="_token" value="{{ csrf_token('strike' ~ user.id) }}">
-                            <input type="text" name="reason" placeholder="Motif" required>
-                            <button type="submit">Strike</button>
-                        </form>
-
-                        {# Bannir ou débannir selon l'état #}
-                        {% if user.bannedDate %}
-                            <form method="post" action="{{ path('app_admin_unban', {id: user.id}) }}">
-                                <input type="hidden" name="_token" value="{{ csrf_token('unban' ~ user.id) }}">
-                                <button type="submit">Débannir</button>
-                            </form>
-                        {% else %}
-                            <form method="post" action="{{ path('app_admin_ban', {id: user.id}) }}">
-                                <input type="hidden" name="_token" value="{{ csrf_token('ban' ~ user.id) }}">
-                                <button type="submit">Bannir</button>
-                            </form>
-                        {% endif %}
+                        <span class="pill pill-open">Actif</span>
                     {% endif %}
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                    <span class="mono text-muted">{{ user.strikes|length }} strike{{ user.strikes|length > 1 ? 's' }}</span>
+                </span>
+            </div>
 
-    <h2>Marques de moto</h2>
+            <h2>{{ user.pseudo }}</h2>
+            <p class="card-route">{{ user.email }}</p>
 
-    {# Ajout d'une marque absente du catalogue #}
-    <form method="post" action="{{ path('app_admin_brand_new') }}">
-        <input type="hidden" name="_token" value="{{ csrf_token('brand_new') }}">
-        <input type="text" name="name" placeholder="Nouvelle marque" maxlength="100" required>
-        <button type="submit">Ajouter</button>
-    </form>
+            {% if user.bannedDate %}
+                <p class="text-muted"><span class="mono">Banni depuis le {{ user.bannedDate|date('d/m/Y') }}</span></p>
+            {% endif %}
 
-    {# Choix de la marque à corriger : recharge /admin?brand=42 #}
-    <form method="get" action="{{ path('app_admin') }}">
-        <select name="brand"
-                data-controller="symfony--ux-autocomplete--autocomplete"
-                data-symfony--ux-autocomplete--autocomplete-no-results-found-text-value="Aucune marque trouvée">
-            <option value="">Choisis une marque</option>
-            {% for brand in brands %}
-                <option value="{{ brand.id }}"{{ brand == selectedBrand ? ' selected' : '' }}>{{ brand.name }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit">Éditer</button>
-    </form>
+            {% if user == app.user %}
+                <p class="text-muted">C'est toi : aucune action possible sur ton propre compte.</p>
+            {% else %}
+                {# Actions repliees : la liste reste lisible quand il y a beaucoup de membres #}
+                <details class="mod-zone">
+                    <summary>Modérer {{ user.pseudo }}</summary>
 
-    {# Correction du nom de la marque sélectionnée #}
-    {% if selectedBrand %}
-        <form method="post" action="{{ path('app_admin_brand_edit', {id: selectedBrand.id}) }}">
-            <input type="hidden" name="_token" value="{{ csrf_token('brand_edit' ~ selectedBrand.id) }}">
-            <input type="text" name="name" value="{{ selectedBrand.name }}" maxlength="100" required>
-            <button type="submit">Enregistrer</button>
+                    <form method="post" action="{{ path('app_admin_strike', {id: user.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('strike' ~ user.id) }}">
+
+                        <div class="field">
+                            <label for="strike_reason_{{ user.id }}">
+                                <span class="tile-label">Motif de l'avertissement</span>
+                            </label>
+                            <input type="text" id="strike_reason_{{ user.id }}" name="reason" class="input" required maxlength="255"
+                                placeholder="Motif de l'avertissement...">
+                            <p class="field-help">Le membre verra ce motif sur son profil.</p>
+                        </div>
+
+                        <button type="submit" class="btn btn-secondary btn-block">Donner un avertissement</button>
+                    </form>
+
+                    {# Form separe, JAMAIS imbrique dans le precedent : les forms HTML imbriques sont interdits #}
+                    {% if user.bannedDate %}
+                        <form method="post" action="{{ path('app_admin_unban', {id: user.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('unban' ~ user.id) }}">
+                            <button type="submit" class="btn btn-secondary btn-block">Débannir</button>
+                        </form>
+                    {% else %}
+                        <details class="danger-zone">
+                            <summary>Bannir ce membre</summary>
+
+                            <div class="danger-zone-body">
+                                <p class="notice">
+                                    Le membre ne pourra plus se connecter. Ses balades et ses commentaires restent en ligne. Le bannissement est réversible.
+                                </p>
+
+                                <form method="post" action="{{ path('app_admin_ban', {id: user.id}) }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('ban' ~ user.id) }}">
+                                    <button type="submit" class="btn btn-primary btn-block">Bannir {{ user.pseudo }}</button>
+                                </form>
+                            </div>
+                        </details>
+                    {% endif %}
+                </details>
+            {% endif %}
+        </article>
+    {% else %}
+        <div class="empty-state">
+            {{ icon.user() }}
+            <p>Aucun membre inscrit.</p>
+        </div>
+    {% endfor %}
+
+    <div class="section-head">
+        <h2>Marques de moto</h2>
+        <span class="mono">{{ brands|length }}</span>
+    </div>
+
+    <section class="card">
+        {# Ajout d'une marque absente du catalogue #}
+        <form method="post" action="{{ path('app_admin_brand_new') }}">
+            <div class="field">
+                <label for="brand_new_name">
+                    <span class="tile-label">Nouvelle marque</span>
+                </label>
+                <input type="text" id="brand_new_name" name="name" class="input" maxlength="100" required
+                    placeholder="Nom de la marque...">
+            </div>
+
+            <input type="hidden" name="_token" value="{{ csrf_token('brand_new') }}">
+            <button type="submit" class="btn btn-secondary btn-block">Ajouter la marque</button>
         </form>
-    {% endif %}
+    </section>
+
+    <section class="card">
+        {# Choix de la marque a corriger : recharge /admin?brand=42 #}
+        <form method="get" action="{{ path('app_admin') }}">
+            <div class="field">
+                <label for="brand_select">
+                    <span class="tile-label">Corriger une marque</span>
+                </label>
+                <select id="brand_select" name="brand" class="input"
+                        data-controller="symfony--ux-autocomplete--autocomplete"
+                        data-symfony--ux-autocomplete--autocomplete-no-results-found-text-value="Aucune marque trouvée">
+                    <option value="">Choisis une marque</option>
+                    {% for brand in brands %}
+                        <option value="{{ brand.id }}"{{ brand == selectedBrand ? ' selected' : '' }}>{{ brand.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-secondary btn-block">Éditer</button>
+        </form>
+
+        {# Correction du nom de la marque selectionnee : form separe, jamais imbrique #}
+        {% if selectedBrand %}
+            <hr>
+
+            <form method="post" action="{{ path('app_admin_brand_edit', {id: selectedBrand.id}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('brand_edit' ~ selectedBrand.id) }}">
+
+                <div class="field">
+                    <label for="brand_edit_name">
+                        <span class="tile-label">Nom de {{ selectedBrand.name }}</span>
+                    </label>
+                    <input type="text" id="brand_edit_name" name="name" class="input" value="{{ selectedBrand.name }}" maxlength="100" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Enregistrer</button>
+            </form>
+        {% endif %}
+    </section>
 {% endblock %}
