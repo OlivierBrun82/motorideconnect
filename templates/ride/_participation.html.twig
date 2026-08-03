@@ -1,31 +1,41 @@
+{# Deux variantes : CTA pleine largeur sur la fiche, simple etat dans une carte de listing #}
+{% set compact = compact|default(false) %}
+
 {% if ride.user == app.user %}
     {#L'utilisateur est l'organisateur : ni inscription ni désinscription #}
-    <p>Tu organises cette balade.</p>
+    <p class="text-muted">Tu organises cette balade.</p>
 
 {% elseif ride.participants.contains(app.user) %}
-    {# Déjà inscrit : bouton de désinscription #}
-    <form method="post" action="{{ path('app_ride_leave', {id: ride.id}) }}">
-        <input type="hidden" name="_token" value="{{ csrf_token('leave' ~ ride.id) }}">
-        <button type="submit">Je me désinscris</button>
-    </form>
-
-{% elseif ride.statut.value == 'open' and (ride.capacity - ride.participants|length) > 0 %}
-    {# Inscriptible : balade ouverte ET place dispo -> form avec moto optionnelle #}
-    <form method="post" action="{{ path('app_ride_participate', {id: ride.id}) }}">
-        <input type="hidden" name="_token" value="{{ csrf_token('participate' ~ ride.id) }}">
-        <select name="motorcycle">
-            <option value="">Sans moto</option>
-            {% for moto in app.user.motorcycles %}
-                <option value="{{ moto.id }}">{{ moto.brand.name ?? '' }} {{ moto.type.label }} ({{ moto.displacement }} cm³)</option>
-            {% endfor %}
-        </select>
-        <button type="submit">Je participe</button>
-    </form>
-    {% if app.user.motorcycles|length == 0 %}
-        <a href="{{ path('app_motorcycle_new') }}">Ajouter une moto au garage</a>
+    {% if compact %}
+        <p class="text-muted">Tu es inscrit.</p>
+    {% else %}
+        {# Déjà inscrit : bouton de désinscription #}
+        <form method="post" action="{{ path('app_ride_leave', {id: ride.id}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('leave' ~ ride.id) }}">
+            <button type="submit" class="btn btn-secondary btn-block">Je me désinscris</button>
+        </form>
     {% endif %}
 
-{% else %}
-    {# Ni inscriptible ni inscrit : complète, annulée... #}
-    <p>Inscriptions fermées {{ include('ride/_status.html.twig', {ride: ride}) }}</p>
+{% elseif not compact and ride.statut.value == 'open' and (ride.capacity - ride.participants|length) > 0 %}
+    {# Inscriptible : balade ouverte ET place dispo -> moto optionnelle puis CTA #}
+    <form method="post" action="{{ path('app_ride_participate', {id: ride.id}) }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('participate' ~ ride.id) }}">
+        <div class="field">
+            <label for="motorcycle">Ta moto pour cette balade</label>
+            <select class="input" id="motorcycle" name="motorcycle">
+                <option value="">Sans moto</option>
+                {% for moto in app.user.motorcycles %}
+                    <option value="{{ moto.id }}">{{ moto.brand.name ?? '' }} {{ moto.type.label }} ({{ moto.displacement }} cm³)</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Rejoindre la balade</button>
+    </form>
+    {% if app.user.motorcycles|length == 0 %}
+        <p class="field-help">Aucune moto dans ton garage — <a href="{{ path('app_motorcycle_new') }}">en ajouter une</a>.</p>
+    {% endif %}
+
+{% elseif not compact %}
+    {# Ni inscriptible ni inscrit : complète, annulée... la pastille est deja affichee plus haut #}
+    <p class="text-muted">Inscriptions fermées.</p>
 {% endif %}

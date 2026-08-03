@@ -7,7 +7,7 @@
     <form method="post" action="{{ path('app_ride_like', {id: ride.id}) }}">
         <input type="hidden" name="_token" value="{{ csrf_token('like' ~ ride.id) }}">
         <button type="submit" class="like{{ isLiked ? ' is-liked' }}" aria-pressed="{{ isLiked ? 'true' : 'false' }}">
-            {{ icon.heart() }}
+            {{ icon.heart(isLiked) }}
             <span class="visually-hidden">{{ isLiked ? 'Ne plus aimer cette balade' : 'Aimer cette balade' }}</span>
             {{ ride.likedBy|length }}
         </button>
