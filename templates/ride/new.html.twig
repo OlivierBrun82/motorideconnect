@@ -2,12 +2,18 @@
 
 {% block title %} Créer une balade {% endblock %}
 
-{% block body %}
-        <h1>Créer ta balade</h1>
+{% block header %}
+    {{ include('_header.html.twig', {
+        title: 'Créer une balade',
+        back: path('app_ride')
+    }, with_context = false) }}
+{% endblock %}
 
-        {{ form_start(form) }}
-        {{ form_widget(form) }}
-        <button type="submit" class="btn btn-primary btn-block">Créer</button>
-        {{ form_end(form) }}
-   
+{% block body %}
+    <h1>Créer ta balade</h1>
+
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button type="submit" class="btn btn-primary btn-block">Créer</button>
+    {{ form_end(form) }}
 {% endblock %}

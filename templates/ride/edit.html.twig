@@ -2,26 +2,70 @@
 
 {% block title %} Modifier ta balade {% endblock %}
 
+{% block header %}
+    {{ include('_header.html.twig', {
+        title: 'Modifier la balade',
+        back: path('app_ride_show', {id: ride.id})
+    }, with_context = false) }}
+{% endblock %}
+
 {% block body %}
-        <h1>Modifier ta balade</h1>
+    <h1>Modifier ta balade</h1>
 
-        {{ form_start(form) }}
-        {{ form_widget(form) }}
-        <button type="submit" class="btn btn-primary btn-block">Modifier</button> <br>
-        {{ form_end(form) }}
-        {% if ride.statut.value != 'canceled' and ride.meetingDatetime > date() %}
-            <form method="post" action="{{ path('app_ride_cancel', {id: ride.id}) }}"
-                onsubmit="return confirm('Annuler cette balade ?');">
-                <input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ ride.id) }}">
-                <label for="cancel_reason">Raison de l'annulation</label>
-                <textarea id="cancel_reason" name="reason" rows="3" required minlength="10" maxlength="500"></textarea>
-                <button type="submit">Annuler la balade</button>
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button type="submit" class="btn btn-primary btn-block">Enregistrer</button>
+    {{ form_end(form) }}
+
+    {# Zones destructrices : repliees, hors du chemin de lecture de l'edition #}
+    {% if ride.statut.value != 'canceled' and ride.meetingDatetime > date() %}
+        <details class="danger-zone">
+            <summary>Annuler la balade</summary>
+
+            <div class="danger-zone-body">
+                {# Rappel de la balade concernee : on ne demande pas de confirmer a l'aveugle #}
+                <div class="card recap">
+                    <div>
+                        <h3>{{ ride.name }}</h3>
+                        <p class="text-muted">{{ ride.meetingPlace }}{% if ride.endPoint %} → {{ ride.endPoint }}{% endif %}</p>
+                    </div>
+                    <span class="pill pill-completed mono">{{ ride.meetingDatetime|date('d/m/Y') }}</span>
+                </div>
+
+                <p class="notice">
+                    {{ ride.participants|length }} participant{{ ride.participants|length > 1 ? 's' }} {{ ride.participants|length > 1 ? 'seront prévenus' : 'sera prévenu' }} par email. La balade restera visible, marquée comme annulée.
+                </p>
+
+                <form method="post" action="{{ path('app_ride_cancel', {id: ride.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ ride.id) }}">
+
+                    <div class="field">
+                        <label for="cancel_reason">
+                            <span class="tile-label">Raison de l'annulation</span>
+                        </label>
+                        <textarea id="cancel_reason" name="reason" class="input" rows="4" required minlength="10" maxlength="500"
+                            placeholder="Précisez la raison de l'annulation..."></textarea>
+                        <p class="field-help">Visible par les participants, de 10 à 500 caractères.</p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">Confirmer l'annulation</button>
+                </form>
+            </div>
+        </details>
+    {% endif %}
+
+    <details class="danger-zone">
+        <summary>Supprimer la balade</summary>
+
+        <div class="danger-zone-body">
+            <p class="notice">
+                La suppression est définitive : la balade et ses commentaires disparaissent, et les participants ne sont pas prévenus. Pour une balade déjà annoncée, préfère l'annulation.
+            </p>
+
+            <form method="post" action="{{ path('app_ride_delete', {id: ride.id}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ride.id) }}">
+                <button type="submit" class="btn btn-primary btn-block">Supprimer définitivement</button>
             </form>
-        {% endif %}
-
-        <form method="post" action="{{ path('app_ride_delete', {id: ride.id}) }}"
-            onsubmit="return confirm('Supprimer cette balade ?');">
-            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ride.id) }}">
-            <button type="submit">Supprimer</button>
-        </form>
+        </div>
+    </details>
 {% endblock %}
