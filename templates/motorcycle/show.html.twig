@@ -2,25 +2,37 @@
 
 {% block title %}{{ motorcycle.brand ? motorcycle.brand.name : 'Moto' }}{% endblock %}
 
+{% block header %}
+    {# brand est nullable : le repli 'Moto' sert de titre partout sur cet ecran #}
+    {{ include('_header.html.twig', {
+        title: motorcycle.brand ? motorcycle.brand.name : 'Moto',
+        back: path('app_motorcycle'),
+        edit: motorcycle.user == app.user ? path('app_motorcycle_edit', {id: motorcycle.id}) : null,
+        editLabel: 'Modifier la moto'
+    }, with_context = false) }}
+{% endblock %}
+
 {% block body %}
-    <h1>{{ motorcycle.type.label }}</h1>
+    {# Le cadre est toujours la : sans photo, le bloc IMG tient la place au lieu de la laisser vide #}
+    <div class="moto-photo">
+        {% if motorcycle.photo %}
+            <img src="{{ asset('uploads/motorcycles/' ~ motorcycle.photo) }}" alt="">
+        {% else %}
+            <span class="moto-photo-empty">IMG</span>
+        {% endif %}
+    </div>
 
-    {% if motorcycle.brand %}
-        <p>Marque : {{ motorcycle.brand.name }}</p>
-    {% endif %}
+    <h1>{{ motorcycle.brand ? motorcycle.brand.name : 'Moto' }}</h1>
+    <p class="card-route">{{ motorcycle.type.label }}</p>
 
-    <p>Cylindrée : {{ motorcycle.displacement }} cm³</p>
-
-    {% if motorcycle.autonomy %}
-        <p>Autonomie : {{ motorcycle.autonomy }} km</p>
-    {% endif %}
-
-    {% if motorcycle.photo %}
-        <img src="{{ asset('uploads/motorcycles/' ~ motorcycle.photo) }}" alt="photo de la moto">
-    {% endif %}
-
-    {% if motorcycle.user == app.user %}
-        <a href="{{ path('app_motorcycle_edit', {id: motorcycle.id}) }}">Modifier</a> <br>
-    {% endif %}
-    <a href="{{ path('app_motorcycle') }}">Retour au garage</a>
+    <div class="tile-row">
+        <div class="tile">
+            <span class="tile-label">Cylindrée</span>
+            <p class="tile-value mono">{{ motorcycle.displacement }} cm³</p>
+        </div>
+        <div class="tile">
+            <span class="tile-label">Autonomie</span>
+            <p class="tile-value mono">{{ motorcycle.autonomy ? motorcycle.autonomy ~ ' km' : '--' }}</p>
+        </div>
+    </div>
 {% endblock %}

@@ -2,13 +2,46 @@
 
 {% block title %}Modifier ma moto{% endblock %}
 
+{% block header %}
+    {{ include('_header.html.twig', {
+        title: 'Modifier la moto',
+        back: path('app_motorcycle_show', {id: motorcycle.id})
+    }, with_context = false) }}
+{% endblock %}
+
 {% block body %}
     <h1>Modifier ma moto</h1>
 
     {{ form_start(form) }}
-        {{ form_widget(form) }}
-        <button type="submit" class="btn btn-primary btn-block">Enregistrer</button>
+    {{ form_widget(form) }}
+    <button type="submit" class="btn btn-primary btn-block">Enregistrer</button>
     {{ form_end(form) }}
 
-    <a href="{{ path('app_motorcycle') }}">Retour au garage</a>
+    {# Form separe, JAMAIS imbrique dans celui de la moto : les forms HTML imbriques sont interdits #}
+    <details class="danger-zone">
+        <summary>Supprimer la moto</summary>
+
+        <div class="danger-zone-body">
+            {# Rappel de la moto concernee : on ne demande pas de confirmer a l'aveugle #}
+            <div class="card recap">
+                <div>
+                    <h3>{{ motorcycle.brand ? motorcycle.brand.name : 'Moto' }}</h3>
+                    <p class="text-muted">{{ motorcycle.type.label }}</p>
+                </div>
+                <span class="mono">{{ motorcycle.displacement }} cm³</span>
+            </div>
+
+            <p class="notice">
+                La suppression est définitive.
+                {% if motorcycle.rides|length > 0 %}
+                    Cette moto est engagée sur <span class="mono">{{ motorcycle.rides|length }}</span> balade{{ motorcycle.rides|length > 1 ? 's' }} : elle en sera retirée, les balades restent.
+                {% endif %}
+            </p>
+
+            <form method="post" action="{{ path('app_motorcycle_delete', {id: motorcycle.id}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ motorcycle.id) }}">
+                <button type="submit" class="btn btn-primary btn-block">Supprimer définitivement</button>
+            </form>
+        </div>
+    </details>
 {% endblock %}
