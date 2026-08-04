@@ -76,4 +76,20 @@ class RideRegistrationManager
 
         $this->em->flush();
     }
+
+    // Apres une edition de capacite, le statut ne correspond plus au nombre d'inscrits.
+    // Pas de flush ici : l'appelant ecrit deja, on evite une seconde ecriture.
+    public function refreshStatus(Ride $ride) : void
+    {
+        // Une balade annulee ou terminee garde son statut, la capacite n'y change rien.
+        if ($ride->getStatut() === RideStatus::Canceled || $ride->getStatut() === RideStatus::Completed) {
+            return;
+        }
+
+        if ($ride->getParticipants()->count() >= $ride->getCapacity()) {
+            $ride->setStatut(RideStatus::Full);
+        } else {
+            $ride->setStatut(RideStatus::Open);
+        }
+    }
 }
