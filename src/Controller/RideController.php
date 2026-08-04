@@ -52,15 +52,20 @@ final class RideController extends AbstractController
 
         // Nombre de balades par organisateur, pour les balades de la page.
         $organizerRideCounts = [];
+        // Duree d'affichage : elle n'est pas stockee en base, il faut la calculer.
+        $durations = [];
+
         foreach ($pagination->items as $ride) {
             $organizerId = $ride->getUser()->getId();
             $organizerRideCounts[$organizerId] ??= $rideRepository->countByOrganizer($ride->getUser());
+            $durations[$ride->getId()] = $rideDuration->format($ride);
         }
 
         return $this->render('ride/index.html.twig', [
             'form' => $form,
             'pagination' => $pagination,
             'organizerRideCounts' => $organizerRideCounts,
+            'durations' => $durations,
         ]);
     }
 

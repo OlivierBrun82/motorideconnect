@@ -2,41 +2,49 @@
 
 {% block title %}Connexion{% endblock %}
 
+{# Pas de barre haute sur les ecrans d'auth : la marque la remplace #}
+{% block header %}{% endblock %}
+
 {% block body %}
-    <form method="post">
-        {% for message in app.flashes('success') %}
-            <div class="alert alert-success">{{ message }}</div>
-        {% endfor %}
+    <div class="auth">
+        <p class="auth-brand">MotoRide-Connect</p>
+
+        <h1>Connexion</h1>
 
         {% if error %}
-            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            <div class="flash-danger" role="alert">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
         {% endif %}
 
         {% if app.user %}
-            <div class="mb-3">
-                Tu es connecté en tant que {{ app.user.userIdentifier }}, <a href="{{ logout_path() }}">Déconnexion</a>
-            </div>
+            <p class="text-muted">
+                Tu es connecté en tant que {{ app.user.userIdentifier }}.
+                <a href="{{ logout_path() }}">Déconnexion</a>
+            </p>
         {% endif %}
 
-        <h1 class="h3 mb-3 font-weight-normal">Connexion</h1>
-        <label for="username">Adresse email</label>
-        <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus>
-        <label for="password">Mot de passe</label>
-        <input type="password" name="_password" id="password" class="form-control" minlength="8" autocomplete="current-password" required>
-        <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
-
-        {#
-            Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
-            See https://symfony.com/doc/current/security/remember_me.html
-
-            <div class="checkbox mb-3">
-                <input type="checkbox" name="_remember_me" id="_remember_me">
-                <label for="_remember_me">Remember me</label>
+        <form method="post">
+            <div class="field">
+                <label for="username">Adresse email</label>
+                <input type="email" value="{{ last_username }}" name="_username" id="username" class="input" autocomplete="email" required autofocus>
             </div>
-        #}
 
-        <button class="btn btn-lg btn-primary" type="submit">
-            Se connecter
-        </button>
-    </form>
+            <div class="field">
+                <label for="password">Mot de passe</label>
+                <input type="password" name="_password" id="password" class="input" minlength="8" autocomplete="current-password" required>
+            </div>
+
+            <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+
+            <button class="btn btn-primary btn-block" type="submit">
+                Se connecter
+            </button>
+        </form>
+
+        <p class="auth-foot">
+            Pas encore de compte ? <a href="{{ path('app_register') }}">Créer un compte</a>
+        </p>
+        <p class="auth-foot text-muted">
+            <a href="{{ path('app_legal') }}">Mentions légales</a>
+        </p>
+    </div>
 {% endblock %}

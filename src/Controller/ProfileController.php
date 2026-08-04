@@ -40,7 +40,7 @@ final class ProfileController extends AbstractController
             // Tente le changement de mot de passe via le service
             if (!$updater->changePassword($user, $currentPassword, $newPassword)) {
                 // Mot de passe actuel incorrect : on n'enregistre pas
-                $this->addFlash('error', 'Le mot de passe actuel est incorrect.');
+                $this->addFlash('danger', 'Le mot de passe actuel est incorrect.');
             } else {
                 // Avatar : si un nouveau fichier est envoyé, on le traite (sinon on garde l'ancien)
                 $avatarFile = $formUser->get('avatarFile')->getData();

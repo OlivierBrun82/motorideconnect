@@ -1,26 +1,55 @@
 {% extends 'base.html.twig' %}
+{% import '_icons.html.twig' as icon %}
 
 {% block title %}Mon garage{% endblock %}
 
 {% block body %}
-    <h1>Mon garage</h1>
+    <div class="section-head">
+        <h1>Mon garage</h1>
+        <span class="mono">{{ motorcycles|length }}</span>
+    </div>
 
-    <a href="{{ path('app_motorcycle_new') }}">Ajouter une moto</a>
+    {% for moto in motorcycles %}
+        <article class="card">
+            {# Toute la ligne est le lien : la vignette seule ferait une cible sous les 44px #}
+            <a class="moto-head" href="{{ path('app_motorcycle_show', {id: moto.id}) }}">
+                <span class="moto-photo moto-photo-sm">
+                    {% if moto.photo %}
+                        <img src="{{ asset('uploads/motorcycles/' ~ moto.photo) }}" alt="">
+                    {% else %}
+                        <span class="moto-photo-empty">IMG</span>
+                    {% endif %}
+                </span>
+                <span class="moto-head-info">
+                    {# brand est nullable sur Motorcycle : jamais deref sans garde #}
+                    <span class="moto-name">{{ moto.brand ? moto.brand.name : 'Moto' }}</span>
+                    <span class="card-route">{{ moto.type.label }}</span>
+                </span>
+            </a>
 
-    <ul>
-        {% for moto in motorcycles %}
-            <li>
-                {{ moto.brand.name }} — {{ moto.type.label }} ({{ moto.displacement }} cm³)
-                <a href="{{ path('app_motorcycle_show', {id: moto.id}) }}">Voir</a>
-                <a href="{{ path('app_motorcycle_edit', {id: moto.id}) }}">Modifier</a>
-            </li>
-            <form method="post" action="{{ path('app_motorcycle_delete', {id: moto.id}) }}"
-                onsubmit="return confirm('Supprimer cette moto ?');">
-                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ moto.id) }}">
-                <button type="submit">Supprimer</button>
-            </form>
-        {% else %}
-            <li>Tu n'as pas encore de moto.</li>
-        {% endfor %}
-    </ul>
+            <div class="tile-row">
+                <div class="tile">
+                    <span class="tile-label">Cylindrée</span>
+                    <p class="tile-value mono">{{ moto.displacement }} cm³</p>
+                </div>
+                <div class="tile">
+                    <span class="tile-label">Autonomie</span>
+                    <p class="tile-value mono">{{ moto.autonomy ? moto.autonomy ~ ' km' : '--' }}</p>
+                </div>
+            </div>
+
+            {# La suppression vit dans l'edition, comme pour les balades : aucun form dans la liste #}
+            <a class="btn btn-secondary btn-block" href="{{ path('app_motorcycle_edit', {id: moto.id}) }}">Modifier</a>
+        </article>
+    {% else %}
+        <div class="empty-state">
+            {{ icon.motorcycle() }}
+            <p>Tu n'as pas encore de moto.</p>
+            <a class="btn btn-primary" href="{{ path('app_motorcycle_new') }}">Ajouter une moto</a>
+        </div>
+    {% endfor %}
+
+    {% if motorcycles|length > 0 %}
+        <a class="btn btn-secondary btn-block" href="{{ path('app_motorcycle_new') }}">Ajouter une moto</a>
+    {% endif %}
 {% endblock %}

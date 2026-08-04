@@ -1,30 +1,43 @@
 {% extends 'base.html.twig' %}
+{% import '_icons.html.twig' as icon %}
 
 {% block title %}Mon profil{% endblock %}
 
 {% block body %}
-    {% for message in app.flashes('success') %}
-        <p>{{ message }}</p>
-    {% endfor %}
-    {% for message in app.flashes('error') %}
-        <p>{{ message }}</p>
-    {% endfor %}
-
     <h1>Mon profil</h1>
 
-    {% if app.user.avatar %}
-        <img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" alt="avatar de {{ app.user.pseudo }}">
-    {% endif %}
+    <div class="organizer">
+        <span class="avatar avatar-lg">
+            {% if app.user.avatar %}
+                <img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" alt="">
+            {% else %}
+                {{ icon.user() }}
+            {% endif %}
+        </span>
+        <div class="organizer-info">
+            <span class="organizer-name">{{ app.user.pseudo }}</span>
+            <span>{{ app.user.email }}</span>
+        </div>
+    </div>
 
     {% if app.user.strikes|length > 0 %}
-        <section>
-            <h2>Mes avertissements ({{ app.user.strikes|length }})</h2>
+        <section class="card card-muted">
+            <div class="section-head">
+                <h2>Mes avertissements</h2>
+                <span class="mono">{{ app.user.strikes|length }}</span>
+            </div>
+
             {% if app.user.bannedDate %}
-                <p><strong>Ton compte est banni.</strong></p>
+                <p class="notice">Ton compte est banni depuis le {{ app.user.bannedDate|date('d/m/Y') }}.</p>
             {% endif %}
-            <ul>
+
+            <ul class="plain-list">
                 {% for strike in app.user.strikes %}
-                    <li>{{ strike.createdAt|date('d/m/Y H:i') }} — {{ strike.reason }}</li>
+                    <li class="comment">
+                        {# Meme habillage que l'horodatage d'un commentaire : c'est la meme donnee #}
+                        <span class="mono text-muted">{{ strike.createdAt|date('d/m/Y H:i') }}</span>
+                        <p>{{ strike.reason }}</p>
+                    </li>
                 {% endfor %}
             </ul>
         </section>
@@ -32,26 +45,30 @@
 
     {{ form_start(profileForm) }}
         {{ form_widget(profileForm) }}
-        <button type="submit">Enregistrer</button>
+        <button type="submit" class="btn btn-primary btn-block">Enregistrer</button>
     {{ form_end(profileForm) }}
 
     {# form separe, JAMAIS imbrique dans celui du profil : les forms HTML imbriques sont interdits #}
-    <section>
-        <h2>Supprimer mon compte</h2>
-        <p>
-            Cette action est irréversible. Tes données personnelles seront effacées
-            et tu ne pourras plus te connecter. Tes balades à venir seront annulées
-            et les participants prévenus par email.
-        </p>
-        <details>
-            <summary>Supprimer définitivement mon compte</summary>
-            <form method="post" action="{{ path('app_profile_delete') }}"
-                onsubmit="return confirm('Supprimer définitivement ton compte ? Cette action est irréversible.');">
+    <details class="danger-zone">
+        <summary>Supprimer mon compte</summary>
+
+        <div class="danger-zone-body">
+            <p class="notice">
+                Cette action est irréversible. Tes données personnelles seront effacées et tu ne pourras
+                plus te connecter. Tes balades à venir seront annulées et les participants prévenus par email.
+            </p>
+
+            <form method="post" action="{{ path('app_profile_delete') }}">
                 <input type="hidden" name="_token" value="{{ csrf_token('delete_account') }}">
-                <label for="delete_password">Confirme ton mot de passe</label>
-                <input type="password" id="delete_password" name="password" required autocomplete="current-password">
-                <button type="submit">Supprimer mon compte</button>
+
+                <div class="field">
+                    <label for="delete_password">Confirme ton mot de passe</label>
+                    <input type="password" id="delete_password" name="password" class="input" required autocomplete="current-password">
+                    <p class="field-help">Le mot de passe est exigé en plus du jeton : le clic seul ne suffit pas.</p>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Supprimer mon compte</button>
             </form>
-        </details>
-    </section>
+        </div>
+    </details>
 {% endblock %}

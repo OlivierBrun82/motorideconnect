@@ -1,3 +1,1357 @@
+/* MotoRide-Connect - feuille de style unique, mobile-first (cible 390x844).
+   Charte de reference : DESIGN.md, dans les documents de travail du projet.
+   Une seule teinte d'accent, 3 usages : focus, onglet actif, coeur aime.
+   Plan du fichier : 16 sections, reperables aux bannieres en majuscules. */
+
+:root {
+    /* Couleurs : une seule teinte d'accent dans tout le systeme */
+    --color-canvas: #F6F6F7;
+    --color-surface: #FFFFFF;
+    --color-ink: #1C1C1E;
+    --color-steel: #6B7280;
+    --color-accent: #475569;
+    --color-hairline: rgba(28, 28, 30, 0.08);
+
+    /* Familles : Space Grotesk titres, Outfit texte, JetBrains Mono chiffres */
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Outfit', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Echelle d'espacement, base 4px */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+    --space-7: 3rem;
+
+    /* Rayons : 12px controles, 16px cartes */
+    --radius-control: 12px;
+    --radius-card: 16px;
+    --radius-pill: 999px;
+
+    /* Largeur de colonne unique, cible mobile 390px */
+    --page-width: 430px;
+
+    /* Cible tactile minimale imposee par la charte */
+    --tap-target: 44px;
+
+    /* Hauteur de la barre d'onglets, reprise par la reserve d'espacement */
+    --tabbar-height: 64px;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 body {
-    background-color: skyblue;
+    margin: 0;
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
+    /* Emails et noms saisis : un jeton insecable ne doit pas elargir la page */
+    overflow-wrap: break-word;
+}
+
+/* == GABARIT ET BASE ======================================================= */
+/* Colonne unique centree : le gabarit de tous les ecrans */
+.page {
+    max-width: var(--page-width);
+    margin-inline: auto;
+    padding: var(--space-4);
+}
+
+h1,
+h2,
+h3 {
+    margin: 0 0 var(--space-3);
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+h1 {
+    font-size: clamp(1.5rem, 1.2rem + 1.5vw, 1.875rem);
+}
+
+h2 {
+    font-size: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+}
+
+h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+p {
+    margin: 0 0 var(--space-3);
+    max-width: 60ch;
+}
+
+/* == TEXTE ET UTILITAIRES DE FOND ========================================== */
+/* Texte secondaire : metadonnees, aide, horodatages */
+.text-muted {
+    color: var(--color-steel);
+}
+
+/* Sinon la regle a { color: ink } rend le lien plus fort que son paragraphe */
+.text-muted a {
+    color: inherit;
+}
+
+/* Chiffres et donnees techniques uniquement : dates, heures, cylindrees, compteurs */
+.mono {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Libelle de tuile : petites capitales en mono, comme sur la maquette */
+.tile-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-steel);
+}
+
+a {
+    color: var(--color-ink);
+    text-decoration-color: var(--color-hairline);
+    text-underline-offset: 0.2em;
+}
+
+a:hover {
+    text-decoration-color: currentColor;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid var(--color-hairline);
+    margin: var(--space-5) 0;
+}
+
+/* Anneau de focus : l'un des trois seuls usages autorises de l'accent */
+:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+/* Icones FontAwesome en SVG inline : formes pleines, la couleur suit le texte parent */
+.icon {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}
+
+/* == NAVIGATION : barre haute, tiroir, onglets ============================= */
+/* Barre haute : collante, sert de repere de positionnement au menu */
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    height: 56px;
+    padding: 0 var(--space-2);
+    background-color: var(--color-canvas);
+    border-bottom: 1px solid var(--color-hairline);
+}
+
+/* Titre tronque : les noms de balade depassent souvent la largeur disponible */
+.topbar-title {
+    flex: 1;
+    min-width: 0;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Boutons lateraux : largeur fixe des deux cotes pour garder le titre centre */
+.topbar-action {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: var(--tap-target);
+    height: var(--tap-target);
+    color: var(--color-ink);
+    text-decoration: none;
+}
+
+/* La marque ne sert qu'au grand ecran : sur mobile le centre revient au titre de page */
+.topbar-brand {
+    display: none;
+}
+
+.topbar-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-pill);
+    object-fit: cover;
+}
+
+/* Retire le triangle natif du summary, qui doublerait l'icone burger */
+.menu > summary {
+    list-style: none;
+    cursor: pointer;
+}
+
+.menu > summary::-webkit-details-marker {
+    display: none;
+}
+
+/* Tiroir : positionne sous la barre pour recouvrir le contenu au lieu de le pousser */
+.menu-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-hairline);
+}
+
+.menu-panel ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.menu-panel a {
+    display: flex;
+    align-items: center;
+    min-height: var(--tap-target);
+    padding: 0 var(--space-4);
+    text-decoration: none;
+}
+
+.menu-panel li + li a {
+    border-top: 1px solid var(--color-hairline);
+}
+
+/* Barre d'onglets basse : pleine largeur, hors du gabarit .page */
+.tabbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    height: var(--tabbar-height);
+    background-color: var(--color-surface);
+    border-top: 1px solid var(--color-hairline);
+}
+
+.tabbar-list {
+    display: flex;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.tabbar-list li {
+    flex: 1;
+}
+
+.tabbar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
+    height: 100%;
+    min-height: var(--tap-target);
+    color: var(--color-steel);
+    font-size: 0.75rem;
+    line-height: 1;
+    text-decoration: none;
+}
+
+/* Onglet actif : l'un des trois seuls usages autorises de l'accent */
+.tabbar-item.is-active {
+    color: var(--color-accent);
+    font-weight: 600;
+}
+
+/* Ecrans qui refusent la barre du bas : les onglets n'apparaissent qu'une fois remontes en haut */
+.tabbar-desktop-only {
+    display: none;
+}
+
+/* La barre est fixe : cette reserve empeche qu'elle masque la fin du contenu */
+.tabbar-spacer {
+    height: var(--tabbar-height);
+}
+
+/* == BOUTONS =============================================================== */
+/* Boutons : primaire ink plein, secondaire blanc a filet */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: var(--tap-target);
+    padding: var(--space-3) var(--space-5);
+    border: 1px solid transparent;
+    border-radius: var(--radius-control);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: var(--color-ink);
+    color: var(--color-surface);
+}
+
+.btn-secondary {
+    background-color: var(--color-surface);
+    border-color: var(--color-hairline);
+    color: var(--color-ink);
+}
+
+/* Retour tactile demande par la charte : le bouton s'enfonce d'un pixel */
+.btn:active {
+    transform: translateY(1px);
+}
+
+/* CTA pleine largeur, comme le bouton Rejoindre de la maquette */
+.btn-block {
+    display: flex;
+    width: 100%;
+}
+
+/* == FORMULAIRES =========================================================== */
+/* Champ de formulaire : le theme Symfony de D4 reprendra ces memes classes */
+.field {
+    margin-bottom: var(--space-4);
+}
+
+.field label {
+    display: block;
+    margin-bottom: var(--space-1);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-steel);
+}
+
+/* 16px obligatoire : en dessous, iOS zoome sur le champ au focus */
+.input {
+    display: block;
+    width: 100%;
+    min-height: var(--tap-target);
+    padding: var(--space-3);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-control);
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: 1rem;
+}
+
+/* Texte d'aide : sous le champ, jamais en infobulle */
+.field-help {
+    margin: var(--space-1) 0 0;
+    color: var(--color-steel);
+    font-size: 0.875rem;
+}
+
+/* Erreurs de champ : le gras porte l'alerte, pas une couleur */
+.field-errors {
+    margin: var(--space-1) 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+/* Case a cocher : le libelle passe a droite et reste cliquable */
+.field-check {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.field-check label {
+    margin-bottom: 0;
+    color: var(--color-ink);
+}
+
+.checkbox {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    accent-color: var(--color-ink);
+}
+
+/* Tom Select : son CSS est charge apres le notre, on repasse dessus par la specificite */
+.field .ts-control {
+    min-height: var(--tap-target);
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-control);
+    background-color: var(--color-surface);
+    box-shadow: none;
+    font-family: var(--font-body);
+    font-size: 1rem;
+}
+
+/* La saisie garde le 13px de Tom Select : sous 16px, iOS zoome au focus */
+.field .ts-control > input {
+    font-size: 1rem;
+}
+
+.field .ts-wrapper.focus .ts-control {
+    border-color: var(--color-accent);
+}
+
+.field .ts-dropdown {
+    margin-top: var(--space-1);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-control);
+    box-shadow: 0 2px 8px rgba(28, 28, 30, 0.08);
+}
+
+/* Option survolee : le theme d'origine la teinte en bleu pale */
+.field .ts-dropdown .active {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+}
+
+/* == MESSAGES FLASH ======================================================== */
+/* Messages flash : deux tons, differencies sans seconde couleur */
+.flash-success,
+.flash-danger {
+    margin-bottom: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-hairline);
+    border-left-width: 3px;
+    border-radius: var(--radius-control);
+    background-color: var(--color-surface);
+}
+
+.flash-success {
+    border-left-color: var(--color-steel);
+}
+
+/* L'erreur pese plus : filet ink et texte plus gras, jamais de rouge */
+.flash-danger {
+    border-left-color: var(--color-ink);
+    font-weight: 500;
+}
+
+/* == CARTES ET FILTRES ===================================================== */
+/* Carte : une carte pour une entite, balade ou moto */
+.card {
+    margin-bottom: var(--space-4);
+    padding: var(--space-4);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-card);
+    background-color: var(--color-surface);
+    box-shadow: 0 1px 2px rgba(28, 28, 30, 0.04);
+}
+
+/* Liste de cartes : sans puce ni retrait, elle empile exactement comme avant sur mobile */
+.card-grid {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* En-tete de carte : statut et places a gauche, like a droite */
+.card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+.card-head-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+/* Le titre d'une carte est plus petit que celui d'une page */
+.card h2 {
+    margin: 0 0 var(--space-1);
+    font-size: 1.25rem;
+}
+
+/* Titre de carte : c'est le lien principal de la rangee, la charte impose 44px */
+.card h2 a {
+    display: flex;
+    align-items: center;
+    min-height: var(--tap-target);
+}
+
+/* Itineraire : depart et arrivee, sous le titre */
+.card-route {
+    margin: 0 0 var(--space-3);
+    color: var(--color-steel);
+}
+
+/* Ligne organisateur : petit avatar suivi du pseudo */
+/* min-height : c'est un lien de rangee entiere, la charte impose 44px */
+.card-organizer {
+    display: flex;
+    align-items: center;
+    min-height: var(--tap-target);
+    gap: var(--space-2);
+    margin: 0;
+    color: var(--color-steel);
+}
+
+/* Avatar reduit, pour une ligne d'information */
+.avatar-sm {
+    width: 20px;
+    height: 20px;
+}
+
+/* Carte attenuee : plus de place, ou balade annulee */
+.card-muted {
+    background-color: var(--color-canvas);
+}
+
+/* Panneau de filtres replie : les resultats restent visibles sans defiler */
+.filters {
+    margin-bottom: var(--space-4);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-card);
+    background-color: var(--color-surface);
+}
+
+.filters > summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--tap-target);
+    padding: 0 var(--space-4);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Corps du panneau : un filet le separe de son propre resume */
+.filters-body {
+    padding: var(--space-4);
+    border-top: 1px solid var(--color-hairline);
+}
+
+/* == TUILES, CHIPS ET PASTILLES ============================================ */
+/* Rangee de tuiles : trois colonnes separees par un filet, comme sur l'accueil */
+.tile-row {
+    display: flex;
+    margin: var(--space-3) 0;
+    border-top: 1px solid var(--color-hairline);
+    border-bottom: 1px solid var(--color-hairline);
+}
+
+.tile-row .tile {
+    flex: 1;
+    padding: var(--space-3) var(--space-2);
+}
+
+.tile-row .tile + .tile {
+    border-left: 1px solid var(--color-hairline);
+}
+
+/* Grille de tuiles encadrees, comme sur la fiche balade */
+.tile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.tile-grid .tile {
+    padding: var(--space-3);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-control);
+    background-color: var(--color-surface);
+}
+
+/* Sous-ligne de tuile : le nom du departement sous l'itineraire */
+.tile-sub {
+    margin: var(--space-1) 0 0;
+    color: var(--color-steel);
+    font-size: 0.875rem;
+}
+
+/* Tuile occupant toute la largeur : kilometrage, itineraire */
+.tile-wide {
+    grid-column: 1 / -1;
+}
+
+.tile-value {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Chips : reservees aux enums, jamais decoratives */
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-pill);
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+.chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+}
+
+/* Pastille de statut : quatre etats, distingues par remplissage et graisse */
+.pill {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* Ouverte : remplissage neutre plein, c'est l'etat courant */
+.pill-open {
+    background-color: var(--color-ink);
+    color: var(--color-surface);
+}
+
+/* Complete : meme remplissage, en plus sourd */
+.pill-full {
+    background-color: var(--color-steel);
+    color: var(--color-surface);
+}
+
+/* Terminee : simple contour, la balade appartient au passe */
+.pill-completed {
+    border-color: var(--color-steel);
+    color: var(--color-steel);
+}
+
+/* Annulee : contour et texte barre */
+.pill-canceled {
+    border-color: var(--color-steel);
+    color: var(--color-steel);
+    text-decoration: line-through;
+}
+
+/* == FICHE BALADE ET ORGANISATEUR ========================================== */
+/* Titre de fiche et like sur une ligne : le like reste a droite, le titre s'etale */
+.ride-title-row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.ride-title-row h1 {
+    flex: 1;
+    margin: 0;
+}
+
+/* Carte organisateur : role en petites capitales, pseudo, compteur de balades */
+.organizer {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    padding: var(--space-3);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-card);
+    background-color: var(--color-surface);
+}
+
+/* min-width : sans lui l'email refuse de retrecir et deborde a 390px */
+.organizer-info {
+    min-width: 0;
+    font-size: 0.875rem;
+}
+
+/* Enfant direct : sinon le .mono du compteur passe en bloc et le nombre part seul a la ligne */
+.organizer-info > span {
+    display: block;
+}
+
+/* Les deux blocs organisateur menent au profil public : pas de soulignement dessus */
+a.organizer,
+a.card-organizer {
+    text-decoration: none;
+}
+
+/* Le survol se marque sur le contenant, pas sur le texte */
+a.organizer:hover {
+    border-color: var(--color-steel);
+}
+
+a.card-organizer:hover {
+    color: var(--color-ink);
+}
+
+/* Sur le profil public, le pseudo est le h1 de la page et vit dans cette carte */
+.organizer h1 {
+    margin: 0;
+}
+
+.organizer-name {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+/* == AVATARS ET PHOTOS ===================================================== */
+/* Avatar rond : l'enveloppe porte la taille, l'image ou l'icone de repli la remplit */
+.avatar {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-canvas);
+    color: var(--color-steel);
+}
+
+.avatar-lg {
+    width: 56px;
+    height: 56px;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Photo de moto : cadre rectangulaire, l'image ou le bloc IMG le remplit */
+.moto-photo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 16 / 9;
+    margin-bottom: var(--space-4);
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    background-color: var(--color-canvas);
+}
+
+.moto-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Vignette carree du garage : meme cadre, format liste */
+.moto-photo-sm {
+    flex: none;
+    aspect-ratio: 1 / 1;
+    width: 64px;
+    margin: 0;
+    border-radius: var(--radius-control);
+}
+
+/* Le mot IMG tient lieu d'illustration : mono et gris, jamais l'accent */
+.moto-photo-empty {
+    color: var(--color-steel);
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    letter-spacing: 0.08em;
+}
+
+/* Ligne titre d'une carte moto : vignette a gauche, marque et type a droite */
+.moto-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    text-decoration: none;
+}
+
+.moto-head-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+/* La marque porte le poids d'un titre de carte, sans en etre un dans le plan du document */
+.moto-name {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.moto-head .card-route {
+    margin: 0;
+}
+
+/* == SECTIONS, PARTICIPANTS ET LISTES ====================================== */
+/* En-tete de section : titre a gauche, compteur a droite */
+.section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+}
+
+.section-head h1,
+.section-head h2 {
+    margin: 0;
+}
+
+/* Lien d'en-tete de section : secondaire, il ne doit pas concurrencer le titre */
+/* Isole en bout de ligne, donc cible tactile a part entiere : 44px imposes */
+.section-head a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap-target);
+    font-size: 0.875rem;
+}
+
+/* Participants : on enroule, jamais de defilement horizontal (charte section 6) */
+.participant-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin: 0 0 var(--space-4);
+    padding: 0;
+    list-style: none;
+}
+
+.participant {
+    width: 64px;
+    text-align: center;
+}
+
+.participant a {
+    text-decoration: none;
+}
+
+.participant .avatar {
+    margin: 0 auto var(--space-1);
+}
+
+/* Pseudo sous l'avatar : tronque, sinon la rangee se deforme */
+.participant-name {
+    display: block;
+    overflow: hidden;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* Liste sans puces : motos engagees, entrees de moderation */
+.plain-list {
+    margin: 0 0 var(--space-4);
+    padding: 0;
+    list-style: none;
+}
+
+/* Bouton discret : les actions destructrices restent atteignables sans attirer */
+.btn-quiet {
+    background: none;
+    border-color: transparent;
+    color: var(--color-steel);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+}
+
+/* == MODERATION, COMMENTAIRES ET LIKE ====================================== */
+/* Moderation : repliee, hors de la lecture normale de la fiche */
+.mod-zone {
+    margin-bottom: var(--space-5);
+    padding: 0 var(--space-3);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-control);
+}
+
+.mod-zone > summary {
+    display: flex;
+    align-items: center;
+    min-height: var(--tap-target);
+    color: var(--color-steel);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.mod-zone li {
+    padding: var(--space-3) 0;
+    border-top: 1px solid var(--color-hairline);
+}
+
+/* Dans une carte, la zone de moderation est le dernier bloc : pas de marge en trop */
+.card .mod-zone {
+    margin-bottom: 0;
+}
+
+/* Bannissement imbrique dans la moderation : la marge de detachement se resserre */
+.mod-zone .danger-zone {
+    margin-top: var(--space-4);
+}
+
+/* Commentaire : un bloc par message, separes par un filet */
+.comment {
+    padding: var(--space-3) 0;
+    border-top: 1px solid var(--color-hairline);
+}
+
+.comment p {
+    margin: var(--space-1) 0 var(--space-2);
+}
+
+.comment-head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+}
+
+.comment-author {
+    font-weight: 600;
+}
+
+/* Like : le remplissage est le seul signal d'etat, jamais la couleur du texte */
+.like {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    /* Les deux axes : empile en colonne sur la fiche, la hauteur seule ne suffisait pas */
+    min-width: var(--tap-target);
+    min-height: var(--tap-target);
+    margin: 0;
+    padding: 0 var(--space-2);
+    border: 0;
+    background: none;
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* Coeur plein : l'un des trois seuls usages autorises de l'accent */
+/* Le passage contour -> plein se fait dans la macro heart(), pas ici */
+.like.is-liked .icon {
+    fill: var(--color-accent);
+}
+
+/* Sur la fiche, la maquette encadre le like : icone et compteur empiles */
+/* Surcharge contextuelle : elle doit rester APRES la regle de base ci-dessus */
+.ride-title-row .like {
+    flex-direction: column;
+    gap: 0;
+    padding: var(--space-2);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-control);
+    background-color: var(--color-surface);
+    font-size: 0.75rem;
+}
+
+/* == ETATS, PAGINATION ET ACCESSIBILITE ==================================== */
+/* Etat vide compose : une illustration, une phrase, un seul CTA */
+.empty-state {
+    padding: var(--space-6) var(--space-4);
+    text-align: center;
+}
+
+.empty-state p {
+    margin: var(--space-4) auto;
+    color: var(--color-steel);
+}
+
+/* Pagination : les deux liens aux extremites, le compteur au centre */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin: var(--space-5) 0;
+}
+
+/* Grand format d'icone, reserve aux illustrations d'etat vide */
+.icon-large {
+    width: 64px;
+    height: 64px;
+    color: var(--color-steel);
+    fill: currentColor;
+}
+
+/* Libelle reserve aux lecteurs d'ecran, quand l'icone porte deja le sens */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    white-space: nowrap;
+}
+
+/* == ZONES SENSIBLES ET AVERTISSEMENTS ===================================== */
+/* Zone destructrice : repliee, detachee du formulaire par une grande marge */
+.danger-zone {
+    margin-top: var(--space-6);
+    padding: 0 var(--space-4);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-card);
+    background-color: var(--color-canvas);
+}
+
+/* Le repli EST la protection : plus de confirm() sur ces deux formulaires */
+.danger-zone > summary {
+    display: flex;
+    align-items: center;
+    min-height: var(--tap-target);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.danger-zone-body {
+    padding-bottom: var(--space-4);
+    border-top: 1px solid var(--color-hairline);
+    padding-top: var(--space-4);
+}
+
+/* Rappel de l'entite concernee : titre a gauche, date a droite */
+.recap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+/* Le bloc titre cede la place a la pastille de date au lieu de pousser la ligne */
+.recap > div {
+    min-width: 0;
+}
+
+.recap h3 {
+    margin: 0;
+}
+
+.recap p {
+    margin: var(--space-1) 0 0;
+}
+
+/* Avertissement : le filet et la graisse portent l'alerte, jamais une teinte */
+/* Taille du corps : ce bloc porte de la prose, la charte interdit sous 16px */
+.notice {
+    margin-bottom: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    border-left: 3px solid var(--color-ink);
+    font-weight: 500;
+}
+
+/* == ECRANS DEDIES : connexion et accueil anonyme ========================== */
+/* Ecran d'authentification : ni barre haute ni barre d'onglets, colonne centree */
+.auth {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 80vh;
+    padding: var(--space-6) 0;
+}
+
+/* La marque remplace la barre haute retiree sur ces deux ecrans */
+.auth-brand {
+    margin-bottom: var(--space-6);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-align: center;
+}
+
+.auth h1 {
+    text-align: center;
+}
+
+/* Bascule vers l'autre parcours, puis mentions legales */
+.auth-foot {
+    margin: var(--space-5) 0 0;
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+.auth-foot + .auth-foot {
+    margin-top: var(--space-3);
+}
+
+/* Accueil anonyme : presentation et inscription, aucune balade affichee */
+.hero {
+    padding: var(--space-6) 0 var(--space-5);
+    text-align: center;
+}
+
+/* Le pitch reste centre : max-width: 60ch sur p le decalerait a gauche */
+.hero-pitch {
+    margin: 0 auto var(--space-6);
+    color: var(--color-steel);
+}
+
+.hero .btn + .btn {
+    margin-top: var(--space-3);
+}
+
+/* Trois arguments sous les CTA : icone a gauche, phrase a droite */
+.hero-points {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.hero-points li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-hairline);
+    color: var(--color-steel);
+}
+
+.hero-points .icon {
+    flex: none;
+    color: var(--color-ink);
+}
+
+/* == GRANDS ECRANS : barre haute unique ==================================== */
+/* Sous 768px l'enveloppe n'a pas de boite : le rendu mobile reste inchange */
+.topbar-shell {
+    display: contents;
+}
+
+/* Sous 768px les liens secondaires ne vivent que dans le tiroir du burger */
+.topbar-links {
+    display: none;
+}
+
+/* A partir de 768px tout remonte sur une seule ligne : titre, onglets, liens */
+@media (min-width: 768px) {
+    /* La colonne s'elargit mais reste une colonne : la prose ne doit pas s'etaler */
+    .page {
+        max-width: 680px;
+    }
+
+    .topbar-shell {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        min-height: 64px;
+        padding: 0 var(--space-4);
+        background-color: var(--color-canvas);
+        border-bottom: 1px solid var(--color-hairline);
+    }
+
+    /* La barre haute rend son fond et son filet a l'enveloppe, et ne porte plus que le titre */
+    .topbar {
+        position: static;
+        flex: 0 1 auto;
+        min-width: 0;
+        height: auto;
+        padding: 0;
+        background-color: transparent;
+        border-bottom: none;
+    }
+
+    /* Le titre de page s'efface : ce coin revient a la marque, et le h1 le porte deja */
+    .topbar-title {
+        display: none;
+        flex: 0 1 auto;
+        text-align: left;
+    }
+
+    /* La marque reprend tout le style du titre et n'en change que l'affichage */
+    /* Elle porte les deux classes, donc elle se tronque pareil si la ligne se serre */
+    .topbar-brand {
+        display: block;
+    }
+
+    /* Le tiroir disparait en entier, panneau compris : ses liens sont en clair a droite */
+    .menu {
+        display: none;
+    }
+
+    /* Avatar et espaceur de centrage disparaissent aussi : Profil est desormais un onglet */
+    .topbar-action {
+        display: none;
+    }
+
+    /* Les onglets quittent le bas de l'ecran et s'alignent dans la barre */
+    .tabbar {
+        position: static;
+        flex: none;
+        height: auto;
+        background-color: transparent;
+        border-top: none;
+    }
+
+    /* Remontee en haut, la barre redevient visible meme sur les ecrans sans barre basse */
+    .tabbar-desktop-only {
+        display: block;
+    }
+
+    .tabbar-list {
+        gap: var(--space-2);
+    }
+
+    /* Les onglets ne se partagent plus la largeur : ils se serrent a gauche */
+    .tabbar-list li {
+        flex: none;
+    }
+
+    .tabbar-item {
+        flex-direction: row;
+        gap: var(--space-2);
+        height: var(--tap-target);
+        padding: 0 var(--space-3);
+        font-size: 0.875rem;
+    }
+
+    /* Entre 768 et 1024 la ligne est trop courte pour tout : le libelle passe aux lecteurs d'ecran */
+    .tabbar-item span {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    /* Plus de barre fixe en bas : la reserve de fin n'a plus d'objet */
+    .tabbar-spacer {
+        display: none;
+    }
+
+    /* Les liens secondaires sortent du tiroir et se rangent a droite de la ligne */
+    .topbar-links {
+        display: block;
+        flex: none;
+        margin-left: auto;
+    }
+
+    .topbar-links ul {
+        display: flex;
+        gap: var(--space-3);
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .topbar-links a {
+        display: flex;
+        align-items: center;
+        min-height: var(--tap-target);
+        color: var(--color-steel);
+        font-size: 0.875rem;
+        text-decoration: none;
+        /* Un lien secondaire ne se coupe jamais en deux lignes dans la barre */
+        white-space: nowrap;
+    }
+}
+
+/* A partir de 1024px la ligne est assez longue : les onglets reprennent leur libelle */
+@media (min-width: 1024px) {
+    .tabbar-item span {
+        position: static;
+        width: auto;
+        height: auto;
+        margin: 0;
+        overflow: visible;
+    }
+
+    /* Assez large pour deux cartes : la colonne cede la place a la grille */
+    .page {
+        max-width: 960px;
+    }
+
+    /* Le 960 est la pour la grille de cartes : un champ de saisie, lui, ne s'etale pas */
+    /* Enfant direct : les formulaires-boutons (like, zone dangereuse) sont imbriques et gardent leur largeur */
+    /* Cale a gauche et non centre : le formulaire reste sous son titre */
+    .page > form {
+        max-width: 680px;
+    }
+
+    /* L'ecran de connexion n'a pas de h1 aligne a gauche : son bloc se centre */
+    .auth {
+        max-width: 680px;
+        margin-inline: auto;
+    }
+
+    .card-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-4);
+    }
+
+    /* Chaque case s'etire, la carte la remplit : les bas de cartes s'alignent */
+    .card-grid > li {
+        display: flex;
+    }
+
+    /* Le gap remplace la marge, sinon l'ecart vertical serait compte deux fois */
+    .card-grid .card {
+        flex: 1;
+        margin-bottom: 0;
+    }
+}
+
+/* == PREFERENCES SYSTEME =================================================== */
+/* La charte plafonne le mouvement : on le coupe si l'utilisateur le demande */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }
