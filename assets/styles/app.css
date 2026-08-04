@@ -1,3 +1,8 @@
+/* MotoRide-Connect - feuille de style unique, mobile-first (cible 390x844).
+   Charte de reference : DESIGN.md, dans les documents de travail du projet.
+   Une seule teinte d'accent, 3 usages : focus, onglet actif, coeur aime.
+   Plan du fichier : 16 sections, reperables aux bannieres en majuscules. */
+
 :root {
     /* Couleurs : une seule teinte d'accent dans tout le systeme */
     --color-canvas: #F6F6F7;
@@ -51,8 +56,11 @@ body {
     font-weight: 400;
     line-height: 1.6;
     -webkit-text-size-adjust: 100%;
+    /* Emails et noms saisis : un jeton insecable ne doit pas elargir la page */
+    overflow-wrap: break-word;
 }
 
+/* == GABARIT ET BASE ======================================================= */
 /* Colonne unique centree : le gabarit de tous les ecrans */
 .page {
     max-width: var(--page-width);
@@ -88,6 +96,7 @@ p {
     max-width: 60ch;
 }
 
+/* == TEXTE ET UTILITAIRES DE FOND ========================================== */
 /* Texte secondaire : metadonnees, aide, horodatages */
 .text-muted {
     color: var(--color-steel);
@@ -137,7 +146,7 @@ hr {
     margin: var(--space-5) 0;
 }
 
-/* Anneau de focus : l'un des quatre seuls usages autorises de l'accent */
+/* Anneau de focus : l'un des trois seuls usages autorises de l'accent */
 :focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
@@ -150,6 +159,7 @@ hr {
     fill: currentColor;
 }
 
+/* == NAVIGATION : barre haute, tiroir, onglets ============================= */
 /* Barre haute : collante, sert de repere de positionnement au menu */
 .topbar {
     position: sticky;
@@ -272,7 +282,7 @@ hr {
     text-decoration: none;
 }
 
-/* Onglet actif : l'un des quatre seuls usages autorises de l'accent */
+/* Onglet actif : l'un des trois seuls usages autorises de l'accent */
 .tabbar-item.is-active {
     color: var(--color-accent);
     font-weight: 600;
@@ -283,6 +293,7 @@ hr {
     height: var(--tabbar-height);
 }
 
+/* == BOUTONS =============================================================== */
 /* Boutons : primaire ink plein, secondaire blanc a filet */
 .btn {
     display: inline-flex;
@@ -324,6 +335,7 @@ hr {
     width: 100%;
 }
 
+/* == FORMULAIRES =========================================================== */
 /* Champ de formulaire : le theme Symfony de D4 reprendra ces memes classes */
 .field {
     margin-bottom: var(--space-4);
@@ -398,6 +410,11 @@ hr {
     font-size: 1rem;
 }
 
+/* La saisie garde le 13px de Tom Select : sous 16px, iOS zoome au focus */
+.field .ts-control > input {
+    font-size: 1rem;
+}
+
 .field .ts-wrapper.focus .ts-control {
     border-color: var(--color-accent);
 }
@@ -415,6 +432,7 @@ hr {
     color: var(--color-ink);
 }
 
+/* == MESSAGES FLASH ======================================================== */
 /* Messages flash : deux tons, differencies sans seconde couleur */
 .flash-success,
 .flash-danger {
@@ -436,6 +454,7 @@ hr {
     font-weight: 500;
 }
 
+/* == CARTES ET FILTRES ===================================================== */
 /* Carte : une carte pour une entite, balade ou moto */
 .card {
     margin-bottom: var(--space-4);
@@ -444,6 +463,13 @@ hr {
     border-radius: var(--radius-card);
     background-color: var(--color-surface);
     box-shadow: 0 1px 2px rgba(28, 28, 30, 0.04);
+}
+
+/* Liste de cartes : sans puce ni retrait, elle empile exactement comme avant sur mobile */
+.card-grid {
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
 /* En-tete de carte : statut et places a gauche, like a droite */
@@ -466,6 +492,13 @@ hr {
     font-size: 1.25rem;
 }
 
+/* Titre de carte : c'est le lien principal de la rangee, la charte impose 44px */
+.card h2 a {
+    display: flex;
+    align-items: center;
+    min-height: var(--tap-target);
+}
+
 /* Itineraire : depart et arrivee, sous le titre */
 .card-route {
     margin: 0 0 var(--space-3);
@@ -473,9 +506,11 @@ hr {
 }
 
 /* Ligne organisateur : petit avatar suivi du pseudo */
+/* min-height : c'est un lien de rangee entiere, la charte impose 44px */
 .card-organizer {
     display: flex;
     align-items: center;
+    min-height: var(--tap-target);
     gap: var(--space-2);
     margin: 0;
     color: var(--color-steel);
@@ -516,6 +551,7 @@ hr {
     border-top: 1px solid var(--color-hairline);
 }
 
+/* == TUILES, CHIPS ET PASTILLES ============================================ */
 /* Rangee de tuiles : trois colonnes separees par un filet, comme sur l'accueil */
 .tile-row {
     display: flex;
@@ -548,6 +584,13 @@ hr {
     background-color: var(--color-surface);
 }
 
+/* Sous-ligne de tuile : le nom du departement sous l'itineraire */
+.tile-sub {
+    margin: var(--space-1) 0 0;
+    color: var(--color-steel);
+    font-size: 0.875rem;
+}
+
 /* Tuile occupant toute la largeur : kilometrage, itineraire */
 .tile-wide {
     grid-column: 1 / -1;
@@ -573,13 +616,6 @@ hr {
     font-size: 0.8125rem;
     line-height: 1.4;
     white-space: nowrap;
-}
-
-/* Chip selectionnee : l'un des quatre seuls usages autorises de l'accent */
-.chip.is-selected {
-    border-color: var(--color-accent);
-    background-color: var(--color-accent);
-    color: var(--color-surface);
 }
 
 .chip-row {
@@ -628,6 +664,7 @@ hr {
     text-decoration: line-through;
 }
 
+/* == FICHE BALADE ET ORGANISATEUR ========================================== */
 /* Titre de fiche et like sur une ligne : le like reste a droite, le titre s'etale */
 .ride-title-row {
     display: flex;
@@ -639,17 +676,6 @@ hr {
 .ride-title-row h1 {
     flex: 1;
     margin: 0;
-}
-
-/* Sur la fiche, la maquette encadre le like : icone et compteur empiles */
-.ride-title-row .like {
-    flex-direction: column;
-    gap: 0;
-    padding: var(--space-2);
-    border: 1px solid var(--color-hairline);
-    border-radius: var(--radius-control);
-    background-color: var(--color-surface);
-    font-size: 0.75rem;
 }
 
 /* Carte organisateur : role en petites capitales, pseudo, compteur de balades */
@@ -664,7 +690,9 @@ hr {
     background-color: var(--color-surface);
 }
 
+/* min-width : sans lui l'email refuse de retrecir et deborde a 390px */
 .organizer-info {
+    min-width: 0;
     font-size: 0.875rem;
 }
 
@@ -699,6 +727,7 @@ a.card-organizer:hover {
     line-height: 1.3;
 }
 
+/* == AVATARS ET PHOTOS ===================================================== */
 /* Avatar rond : l'enveloppe porte la taille, l'image ou l'icone de repli la remplit */
 .avatar {
     display: flex;
@@ -786,6 +815,7 @@ a.card-organizer:hover {
     margin: 0;
 }
 
+/* == SECTIONS, PARTICIPANTS ET LISTES ====================================== */
 /* En-tete de section : titre a gauche, compteur a droite */
 .section-head {
     display: flex;
@@ -798,6 +828,15 @@ a.card-organizer:hover {
 .section-head h1,
 .section-head h2 {
     margin: 0;
+}
+
+/* Lien d'en-tete de section : secondaire, il ne doit pas concurrencer le titre */
+/* Isole en bout de ligne, donc cible tactile a part entiere : 44px imposes */
+.section-head a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap-target);
+    font-size: 0.875rem;
 }
 
 /* Participants : on enroule, jamais de defilement horizontal (charte section 6) */
@@ -832,13 +871,6 @@ a.card-organizer:hover {
     text-overflow: ellipsis;
 }
 
-/* Sous-ligne de tuile : le nom du departement sous l'itineraire */
-.tile-sub {
-    margin: var(--space-1) 0 0;
-    color: var(--color-steel);
-    font-size: 0.875rem;
-}
-
 /* Liste sans puces : motos engagees, entrees de moderation */
 .plain-list {
     margin: 0 0 var(--space-4);
@@ -857,6 +889,7 @@ a.card-organizer:hover {
     text-underline-offset: 0.2em;
 }
 
+/* == MODERATION, COMMENTAIRES ET LIKE ====================================== */
 /* Moderation : repliee, hors de la lecture normale de la fiche */
 .mod-zone {
     margin-bottom: var(--space-5);
@@ -926,12 +959,25 @@ a.card-organizer:hover {
     cursor: pointer;
 }
 
-/* Coeur plein : l'un des quatre seuls usages autorises de l'accent */
+/* Coeur plein : l'un des trois seuls usages autorises de l'accent */
 /* Le passage contour -> plein se fait dans la macro heart(), pas ici */
 .like.is-liked .icon {
     fill: var(--color-accent);
 }
 
+/* Sur la fiche, la maquette encadre le like : icone et compteur empiles */
+/* Surcharge contextuelle : elle doit rester APRES la regle de base ci-dessus */
+.ride-title-row .like {
+    flex-direction: column;
+    gap: 0;
+    padding: var(--space-2);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-control);
+    background-color: var(--color-surface);
+    font-size: 0.75rem;
+}
+
+/* == ETATS, PAGINATION ET ACCESSIBILITE ==================================== */
 /* Etat vide compose : une illustration, une phrase, un seul CTA */
 .empty-state {
     padding: var(--space-6) var(--space-4);
@@ -972,6 +1018,7 @@ a.card-organizer:hover {
     white-space: nowrap;
 }
 
+/* == ZONES SENSIBLES ET AVERTISSEMENTS ===================================== */
 /* Zone destructrice : repliee, detachee du formulaire par une grande marge */
 .danger-zone {
     margin-top: var(--space-6);
@@ -1004,6 +1051,11 @@ a.card-organizer:hover {
     gap: var(--space-3);
 }
 
+/* Le bloc titre cede la place a la pastille de date au lieu de pousser la ligne */
+.recap > div {
+    min-width: 0;
+}
+
 .recap h3 {
     margin: 0;
 }
@@ -1013,14 +1065,15 @@ a.card-organizer:hover {
 }
 
 /* Avertissement : le filet et la graisse portent l'alerte, jamais une teinte */
+/* Taille du corps : ce bloc porte de la prose, la charte interdit sous 16px */
 .notice {
     margin-bottom: var(--space-4);
     padding: var(--space-3) var(--space-4);
     border-left: 3px solid var(--color-ink);
-    font-size: 0.875rem;
     font-weight: 500;
 }
 
+/* == ECRANS DEDIES : connexion et accueil anonyme ========================== */
 /* Ecran d'authentification : ni barre haute ni barre d'onglets, colonne centree */
 .auth {
     display: flex;
@@ -1092,11 +1145,167 @@ a.card-organizer:hover {
     color: var(--color-ink);
 }
 
-/* Lien d'en-tete de section : secondaire, il ne doit pas concurrencer le titre */
-.section-head a {
-    font-size: 0.875rem;
+/* == GRANDS ECRANS : barre haute unique ==================================== */
+/* Sous 768px l'enveloppe n'a pas de boite : le rendu mobile reste inchange */
+.topbar-shell {
+    display: contents;
 }
 
+/* Sous 768px les liens secondaires ne vivent que dans le tiroir du burger */
+.topbar-links {
+    display: none;
+}
+
+/* A partir de 768px tout remonte sur une seule ligne : titre, onglets, liens */
+@media (min-width: 768px) {
+    /* La colonne s'elargit mais reste une colonne : la prose ne doit pas s'etaler */
+    .page {
+        max-width: 680px;
+    }
+
+    .topbar-shell {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        min-height: 64px;
+        padding: 0 var(--space-4);
+        background-color: var(--color-canvas);
+        border-bottom: 1px solid var(--color-hairline);
+    }
+
+    /* La barre haute rend son fond et son filet a l'enveloppe, et ne porte plus que le titre */
+    .topbar {
+        position: static;
+        flex: 0 1 auto;
+        min-width: 0;
+        height: auto;
+        padding: 0;
+        background-color: transparent;
+        border-bottom: none;
+    }
+
+    /* Le titre cesse d'etre centre, et reste le seul a se laisser tronquer */
+    .topbar-title {
+        flex: 0 1 auto;
+        text-align: left;
+    }
+
+    /* Le tiroir disparait en entier, panneau compris : ses liens sont en clair a droite */
+    .menu {
+        display: none;
+    }
+
+    /* Avatar et espaceur de centrage disparaissent aussi : Profil est desormais un onglet */
+    .topbar-action {
+        display: none;
+    }
+
+    /* Les onglets quittent le bas de l'ecran et s'alignent dans la barre */
+    .tabbar {
+        position: static;
+        flex: none;
+        height: auto;
+        background-color: transparent;
+        border-top: none;
+    }
+
+    .tabbar-list {
+        gap: var(--space-2);
+    }
+
+    /* Les onglets ne se partagent plus la largeur : ils se serrent a gauche */
+    .tabbar-list li {
+        flex: none;
+    }
+
+    .tabbar-item {
+        flex-direction: row;
+        gap: var(--space-2);
+        height: var(--tap-target);
+        padding: 0 var(--space-3);
+        font-size: 0.875rem;
+    }
+
+    /* Entre 768 et 1024 la ligne est trop courte pour tout : le libelle passe aux lecteurs d'ecran */
+    .tabbar-item span {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    /* Plus de barre fixe en bas : la reserve de fin n'a plus d'objet */
+    .tabbar-spacer {
+        display: none;
+    }
+
+    /* Les liens secondaires sortent du tiroir et se rangent a droite de la ligne */
+    .topbar-links {
+        display: block;
+        flex: none;
+        margin-left: auto;
+    }
+
+    .topbar-links ul {
+        display: flex;
+        gap: var(--space-3);
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .topbar-links a {
+        display: flex;
+        align-items: center;
+        min-height: var(--tap-target);
+        color: var(--color-steel);
+        font-size: 0.875rem;
+        text-decoration: none;
+        /* Un lien secondaire ne se coupe jamais en deux lignes dans la barre */
+        white-space: nowrap;
+    }
+}
+
+/* A partir de 1024px la ligne est assez longue : les onglets reprennent leur libelle */
+@media (min-width: 1024px) {
+    .tabbar-item span {
+        position: static;
+        width: auto;
+        height: auto;
+        margin: 0;
+        overflow: visible;
+    }
+
+    /* Assez large pour deux cartes : la colonne cede la place a la grille */
+    .page {
+        max-width: 960px;
+    }
+
+    .card-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-4);
+    }
+
+    /* Chaque case s'etire, la carte la remplit : les bas de cartes s'alignent */
+    .card-grid > li {
+        display: flex;
+    }
+
+    /* Le gap remplace la marge, sinon l'ecart vertical serait compte deux fois */
+    .card-grid .card {
+        flex: 1;
+        margin-bottom: 0;
+    }
+}
+
+/* == PREFERENCES SYSTEME =================================================== */
 /* La charte plafonne le mouvement : on le coupe si l'utilisateur le demande */
 @media (prefers-reduced-motion: reduce) {
     *,

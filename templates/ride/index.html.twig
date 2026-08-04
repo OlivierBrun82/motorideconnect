@@ -26,9 +26,14 @@
         <span class="mono text-muted">{{ pagination.totalItems }} balade{{ pagination.totalItems > 1 ? 's' }}</span>
     </div>
 
-    {% for ride in pagination.items %}
-        {# Carte extraite en D7 : le fil de l'accueil affiche la meme, sans la dupliquer #}
-        {{ include('ride/_card.html.twig', {ride: ride}) }}
+    {% if pagination.items is not empty %}
+        {# Une suite de balades est une liste : ce conteneur porte aussi la grille desktop #}
+        <ul class="card-grid">
+            {% for ride in pagination.items %}
+                {# Carte extraite en D7 : le fil de l'accueil affiche la meme, sans la dupliquer #}
+                <li>{{ include('ride/_card.html.twig', {ride: ride}) }}</li>
+            {% endfor %}
+        </ul>
     {% else %}
         {# Etat vide compose : illustration, une phrase, un seul CTA (charte section 4) #}
         <div class="empty-state">
@@ -36,7 +41,7 @@
             <p>Aucune balade ne correspond à ta recherche.</p>
             <a class="btn btn-primary" href="{{ path('app_ride_new') }}">Créer une balade</a>
         </div>
-    {% endfor %}
+    {% endif %}
 
     {{ include('ride/_pagination.html.twig', {pagination: pagination}) }}
 {% endblock %}

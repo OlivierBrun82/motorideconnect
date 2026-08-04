@@ -87,7 +87,8 @@
     <h2>Motos engagées</h2>
     <ul class="plain-list">
         {% for moto in ride.motorcycles %}
-            <li>{{ moto.user.pseudo }} — <span class="mono">{{ moto.brand.name ?? '' }} {{ moto.type.label }} ({{ moto.displacement }} cm³)</span></li>
+            {# brand est nullable : meme repli 'Moto' que le garage et le profil public #}
+            <li>{{ moto.user.pseudo }} — <span class="mono">{{ moto.brand ? moto.brand.name : 'Moto' }} {{ moto.type.label }} ({{ moto.displacement }} cm³)</span></li>
         {% else %}
             <li class="text-muted">Aucune moto engagée pour l'instant.</li>
         {% endfor %}
@@ -130,8 +131,8 @@
                             </div>
                             <button type="submit" class="btn btn-quiet">Avertir</button>
                         </form>
-                        <form method="post" action="{{ path('app_ride_exclude', {ride: ride.id, user: participant.id}) }}"
-                              onsubmit="return confirm('Exclure ce participant ?');">
+                        {# Pas de confirm() : le repli de la zone de moderation EST la protection #}
+                        <form method="post" action="{{ path('app_ride_exclude', {ride: ride.id, user: participant.id}) }}">
                             <input type="hidden" name="_token" value="{{ csrf_token('exclude_participant' ~ participant.id) }}">
                             <button type="submit" class="btn btn-quiet">Exclure</button>
                         </form>
@@ -157,22 +158,26 @@
             {% if comment.user == app.user or ride.user == app.user or is_granted('ROLE_ADMIN') %}
                 {# retrait volontaire par l'auteur, ou acte de moderation sur le message d'un autre #}
                 {% set isSelfDeletion = comment.user == app.user %}
-                {% set confirmText = isSelfDeletion
-                    ? 'Supprimer ton commentaire ?'
-                    : 'Supprimer ce message et donner un avertissement a son auteur ?' %}
 
-                <form method="post" action="{{ path('app_comment_delete', {id: comment.id}) }}"
-                      onsubmit="return confirm('{{ confirmText|e('js') }}');">
-                    <input type="hidden" name="_token" value="{{ csrf_token('delete_comment' ~ comment.id) }}">
-                    {% if not isSelfDeletion %}
-                        {# motif obligatoire en moderation : il part en strike a l'auteur #}
-                        <div class="field">
-                            <label for="strike_reason_{{ comment.id }}">Motif de la suppression</label>
-                            <textarea class="input" id="strike_reason_{{ comment.id }}" name="reason" rows="2" required minlength="10" maxlength="500"></textarea>
-                        </div>
-                    {% endif %}
-                    <button type="submit" class="btn btn-quiet">Supprimer</button>
-                </form>
+                {# Repliee : plus de confirm(), et le motif ne s'etale plus sous chaque commentaire #}
+                <details class="mod-zone">
+                    <summary>{{ isSelfDeletion ? 'Supprimer mon commentaire' : 'Modérer ce message' }}</summary>
+                    <ul class="plain-list">
+                        <li>
+                            <form method="post" action="{{ path('app_comment_delete', {id: comment.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete_comment' ~ comment.id) }}">
+                                {% if not isSelfDeletion %}
+                                    {# motif obligatoire en moderation : il part en strike a l'auteur #}
+                                    <div class="field">
+                                        <label for="strike_reason_{{ comment.id }}">Motif de la suppression</label>
+                                        <textarea class="input" id="strike_reason_{{ comment.id }}" name="reason" rows="2" required minlength="10" maxlength="500"></textarea>
+                                    </div>
+                                {% endif %}
+                                <button type="submit" class="btn btn-quiet">Supprimer</button>
+                            </form>
+                        </li>
+                    </ul>
+                </details>
             {% endif %}
         </div>
     {% else %}

@@ -9,8 +9,13 @@
             <a href="{{ path('app_ride') }}">Filtrer</a>
         </div>
 
-        {% for ride in rides %}
-            {{ include('ride/_card.html.twig', {ride: ride}) }}
+        {% if rides is not empty %}
+            {# Une suite de balades est une liste : ce conteneur porte aussi la grille desktop #}
+            <ul class="card-grid">
+                {% for ride in rides %}
+                    <li>{{ include('ride/_card.html.twig', {ride: ride}) }}</li>
+                {% endfor %}
+            </ul>
         {% else %}
             {# Etat vide compose : illustration, une phrase, un seul CTA (charte section 4) #}
             <div class="empty-state">
@@ -18,7 +23,7 @@
                 <p>Aucune balade à venir pour le moment.</p>
                 <a class="btn btn-primary" href="{{ path('app_ride_new') }}">Créer une balade</a>
             </div>
-        {% endfor %}
+        {% endif %}
 
         {% if rides|length > 0 %}
             <a class="btn btn-secondary btn-block" href="{{ path('app_ride') }}">Voir toutes les balades</a>

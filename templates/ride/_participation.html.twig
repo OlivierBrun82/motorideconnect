@@ -24,8 +24,9 @@
             <label for="motorcycle">Ta moto pour cette balade</label>
             <select class="input" id="motorcycle" name="motorcycle">
                 <option value="">Sans moto</option>
+                {# brand est nullable : meme repli 'Moto' que le garage et le profil public #}
                 {% for moto in app.user.motorcycles %}
-                    <option value="{{ moto.id }}">{{ moto.brand.name ?? '' }} {{ moto.type.label }} ({{ moto.displacement }} cm³)</option>
+                    <option value="{{ moto.id }}">{{ moto.brand ? moto.brand.name : 'Moto' }} {{ moto.type.label }} ({{ moto.displacement }} cm³)</option>
                 {% endfor %}
             </select>
         </div>

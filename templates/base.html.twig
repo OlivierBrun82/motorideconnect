@@ -15,7 +15,17 @@
         {% endblock %}
     </head>
     <body>
-        {% block header %}{{ include('_header.html.twig', {}, with_context = false) }}{% endblock %}
+        {# Enveloppe sans boite sur mobile : elle ne sert qu'a aligner la barre haute sur grand ecran #}
+        <div class="topbar-shell">
+            {% block header %}{{ include('_header.html.twig', {}, with_context = false) }}{% endblock %}
+
+            {% block nav %}{{ include('_tabbar.html.twig') }}{% endblock %}
+
+            {# Doublon assume du tiroir : un seul des deux jeux est affiche a la fois #}
+            <nav class="topbar-links" aria-label="Menu secondaire">
+                {{ include('_menu.html.twig', {}, with_context = false) }}
+            </nav>
+        </div>
 
         <main class="page">
             <div data-turbo-temporary>
@@ -30,6 +40,7 @@
             {% block body %}{% endblock %}
         </main>
 
-        {% block footer %}{{ include('_footer.html.twig') }}{% endblock %}
+        {# Reserve de fin : la barre est fixe, sans elle elle masquerait le dernier contenu #}
+        {% block footer %}{% if app.user %}<div class="tabbar-spacer"></div>{% endif %}{% endblock %}
     </body>
 </html>
