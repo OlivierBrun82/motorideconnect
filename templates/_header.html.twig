@@ -20,6 +20,9 @@
 
     <span class="topbar-title">{{ title }}</span>
 
+    {# Sur grand ecran ce coin porte la marque, le titre de page etant deja dans le h1 #}
+    <span class="topbar-title topbar-brand">MotoRide-Connect</span>
+
     {% if not back and app.user %}
         <a href="{{ path('app_profile') }}" class="topbar-action" aria-label="Mon profil">
             {% if app.user.avatar %}

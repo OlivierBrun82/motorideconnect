@@ -199,6 +199,11 @@ hr {
     text-decoration: none;
 }
 
+/* La marque ne sert qu'au grand ecran : sur mobile le centre revient au titre de page */
+.topbar-brand {
+    display: none;
+}
+
 .topbar-avatar {
     width: 32px;
     height: 32px;
@@ -286,6 +291,11 @@ hr {
 .tabbar-item.is-active {
     color: var(--color-accent);
     font-weight: 600;
+}
+
+/* Ecrans qui refusent la barre du bas : les onglets n'apparaissent qu'une fois remontes en haut */
+.tabbar-desktop-only {
+    display: none;
 }
 
 /* La barre est fixe : cette reserve empeche qu'elle masque la fin du contenu */
@@ -696,7 +706,8 @@ hr {
     font-size: 0.875rem;
 }
 
-.organizer-info span {
+/* Enfant direct : sinon le .mono du compteur passe en bloc et le nombre part seul a la ligne */
+.organizer-info > span {
     display: block;
 }
 
@@ -948,6 +959,8 @@ a.card-organizer:hover {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
+    /* Les deux axes : empile en colonne sur la fiche, la hauteur seule ne suffisait pas */
+    min-width: var(--tap-target);
     min-height: var(--tap-target);
     margin: 0;
     padding: 0 var(--space-2);
@@ -1187,10 +1200,17 @@ a.card-organizer:hover {
         border-bottom: none;
     }
 
-    /* Le titre cesse d'etre centre, et reste le seul a se laisser tronquer */
+    /* Le titre de page s'efface : ce coin revient a la marque, et le h1 le porte deja */
     .topbar-title {
+        display: none;
         flex: 0 1 auto;
         text-align: left;
+    }
+
+    /* La marque reprend tout le style du titre et n'en change que l'affichage */
+    /* Elle porte les deux classes, donc elle se tronque pareil si la ligne se serre */
+    .topbar-brand {
+        display: block;
     }
 
     /* Le tiroir disparait en entier, panneau compris : ses liens sont en clair a droite */
@@ -1210,6 +1230,11 @@ a.card-organizer:hover {
         height: auto;
         background-color: transparent;
         border-top: none;
+    }
+
+    /* Remontee en haut, la barre redevient visible meme sur les ecrans sans barre basse */
+    .tabbar-desktop-only {
+        display: block;
     }
 
     .tabbar-list {
@@ -1285,6 +1310,19 @@ a.card-organizer:hover {
     /* Assez large pour deux cartes : la colonne cede la place a la grille */
     .page {
         max-width: 960px;
+    }
+
+    /* Le 960 est la pour la grille de cartes : un champ de saisie, lui, ne s'etale pas */
+    /* Enfant direct : les formulaires-boutons (like, zone dangereuse) sont imbriques et gardent leur largeur */
+    /* Cale a gauche et non centre : le formulaire reste sous son titre */
+    .page > form {
+        max-width: 680px;
+    }
+
+    /* L'ecran de connexion n'a pas de h1 aligne a gauche : son bloc se centre */
+    .auth {
+        max-width: 680px;
+        margin-inline: auto;
     }
 
     .card-grid {
