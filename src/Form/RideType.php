@@ -15,8 +15,12 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints\Range;
 
 class RideType extends AbstractType
 {
@@ -82,6 +86,13 @@ class RideType extends AbstractType
             ->add('capacity', null, [
                 'label' => 'Nombre de places',
                 'attr' => ['min' => 2, 'max' => 8],
+                'constraints' => [
+                    new Range(
+                        notInRangeMessage: 'Le nombre de places doit être compris entre {{ min }} et {{ max }}.',
+                        min: 2,
+                        max: 8,
+                    ),
+                ],
             ])
             ->add('motorcycle', EntityType::class, [
                 'label' => 'Ta moto pour cette balade',
@@ -98,6 +109,18 @@ class RideType extends AbstractType
                     ->orderBy('m.type', 'ASC'),
             ])
         ;
+
+        // La capacite ne peut pas descendre sous le nombre d'inscrits deja presents.
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+            $ride = $event->getData();
+            $registeredCount = $ride->getParticipants()->count();
+
+            if ($ride->getCapacity() !== null && $ride->getCapacity() < $registeredCount) {
+                $event->getForm()->get('capacity')->addError(new FormError(
+                    sprintf('Cette balade compte déjà %d inscrit(s) : tu ne peux pas descendre en dessous.', $registeredCount)
+                ));
+            }
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver): void

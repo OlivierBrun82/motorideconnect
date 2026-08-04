@@ -156,7 +156,7 @@ final class RideController extends AbstractController
         }
     
     #[Route('/edit/{id}', name: 'app_ride_edit', methods:['GET', 'POST'])]
-        public function edit(Ride $ride, Request $request, EntityManagerInterface $em) : Response
+        public function edit(Ride $ride, Request $request, EntityManagerInterface $em, RideRegistrationManager $manager) : Response
         {
             // organisateur OU admin (override) peuvent editer
             if ($ride->getUser() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
@@ -173,6 +173,9 @@ final class RideController extends AbstractController
                 if ($motorcycle) {
                     $ride->addMotorcycle($motorcycle);
                 }
+
+                // la capacite a pu changer : on recale Complete / Ouverte en consequence
+                $manager->refreshStatus($ride);
 
                 $em->flush();
                 $this->addFlash('success', 'Balade modifiée.');
