@@ -4,7 +4,10 @@
     {% import '_icons.html.twig' as icon %}
     {% set route = app.request.attributes.get('_route') %}
 
-    <nav class="tabbar" aria-label="Navigation principale">
+    {# desktopOnly : ecrans qui refusent la barre du bas, mais gardent les onglets en haut #}
+    {% set desktopOnly = desktopOnly|default(false) %}
+
+    <nav class="tabbar{{ desktopOnly ? ' tabbar-desktop-only' : '' }}" aria-label="Navigation principale">
         <ul class="tabbar-list">
             <li>
                 <a href="{{ path('app_home') }}" class="tabbar-item{{ route == 'app_home' ? ' is-active' : '' }}"

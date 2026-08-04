@@ -3,9 +3,11 @@
 
 {% block title %}Administration{% endblock %}
 
-{# Back-office : pas de barre d'onglets (charte section 5), le menu suffit a en sortir #}
-{# Deux blocs a neutraliser : la barre elle-meme, puis sa reserve d'espace de fin #}
-{% block nav %}{% endblock %}
+{# Back-office : pas de barre d'onglets EN BAS (charte section 5) #}
+{# Mais les onglets restent en haut des 768px, sinon on ne sort plus de l'ecran #}
+{% block nav %}{{ include('_tabbar.html.twig', {desktopOnly: true}) }}{% endblock %}
+
+{# Reserve d'espace de fin neutralisee : sans barre basse, elle n'a rien a reserver #}
 {% block footer %}{% endblock %}
 
 {% block body %}
