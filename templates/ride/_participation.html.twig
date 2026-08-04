@@ -16,8 +16,11 @@
         </form>
     {% endif %}
 
-{% elseif not compact and ride.statut.value == 'open' and (ride.capacity - ride.participants|length) > 0 %}
-    {# Inscriptible : balade ouverte ET place dispo -> moto optionnelle puis CTA #}
+{% elseif not compact
+      and ride.statut.value == 'open'
+      and ride.meetingDatetime > date()
+      and (ride.capacity - ride.participants|length) > 0 %}
+    {# Inscriptible : balade ouverte, a venir ET place dispo -> moto optionnelle puis CTA #}
     <form method="post" action="{{ path('app_ride_participate', {id: ride.id}) }}">
         <input type="hidden" name="_token" value="{{ csrf_token('participate' ~ ride.id) }}">
         <div class="field">
