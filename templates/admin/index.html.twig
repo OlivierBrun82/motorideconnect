@@ -4,6 +4,8 @@
 {% block title %}Administration{% endblock %}
 
 {# Back-office : pas de barre d'onglets (charte section 5), le menu suffit a en sortir #}
+{# Deux blocs a neutraliser : la barre elle-meme, puis sa reserve d'espace de fin #}
+{% block nav %}{% endblock %}
 {% block footer %}{% endblock %}
 
 {% block body %}
@@ -47,9 +49,7 @@
                         <input type="hidden" name="_token" value="{{ csrf_token('strike' ~ user.id) }}">
 
                         <div class="field">
-                            <label for="strike_reason_{{ user.id }}">
-                                <span class="tile-label">Motif de l'avertissement</span>
-                            </label>
+                            <label for="strike_reason_{{ user.id }}">Motif de l'avertissement</label>
                             <input type="text" id="strike_reason_{{ user.id }}" name="reason" class="input" required maxlength="255"
                                 placeholder="Motif de l'avertissement...">
                             <p class="field-help">Le membre verra ce motif sur son profil.</p>
@@ -99,9 +99,7 @@
         {# Ajout d'une marque absente du catalogue #}
         <form method="post" action="{{ path('app_admin_brand_new') }}">
             <div class="field">
-                <label for="brand_new_name">
-                    <span class="tile-label">Nouvelle marque</span>
-                </label>
+                <label for="brand_new_name">Nouvelle marque</label>
                 <input type="text" id="brand_new_name" name="name" class="input" maxlength="100" required
                     placeholder="Nom de la marque...">
             </div>
@@ -115,9 +113,7 @@
         {# Choix de la marque a corriger : recharge /admin?brand=42 #}
         <form method="get" action="{{ path('app_admin') }}">
             <div class="field">
-                <label for="brand_select">
-                    <span class="tile-label">Corriger une marque</span>
-                </label>
+                <label for="brand_select">Corriger une marque</label>
                 <select id="brand_select" name="brand" class="input"
                         data-controller="symfony--ux-autocomplete--autocomplete"
                         data-symfony--ux-autocomplete--autocomplete-no-results-found-text-value="Aucune marque trouvée">
@@ -139,9 +135,7 @@
                 <input type="hidden" name="_token" value="{{ csrf_token('brand_edit' ~ selectedBrand.id) }}">
 
                 <div class="field">
-                    <label for="brand_edit_name">
-                        <span class="tile-label">Nom de {{ selectedBrand.name }}</span>
-                    </label>
+                    <label for="brand_edit_name">Nom de {{ selectedBrand.name }}</label>
                     <input type="text" id="brand_edit_name" name="name" class="input" value="{{ selectedBrand.name }}" maxlength="100" required>
                 </div>
 

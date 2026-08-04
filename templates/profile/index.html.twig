@@ -34,7 +34,8 @@
             <ul class="plain-list">
                 {% for strike in app.user.strikes %}
                     <li class="comment">
-                        <span class="tile-label"><span class="mono">{{ strike.createdAt|date('d/m/Y H:i') }}</span></span>
+                        {# Meme habillage que l'horodatage d'un commentaire : c'est la meme donnee #}
+                        <span class="mono text-muted">{{ strike.createdAt|date('d/m/Y H:i') }}</span>
                         <p>{{ strike.reason }}</p>
                     </li>
                 {% endfor %}

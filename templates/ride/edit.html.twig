@@ -40,9 +40,7 @@
                     <input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ ride.id) }}">
 
                     <div class="field">
-                        <label for="cancel_reason">
-                            <span class="tile-label">Raison de l'annulation</span>
-                        </label>
+                        <label for="cancel_reason">Raison de l'annulation</label>
                         <textarea id="cancel_reason" name="reason" class="input" rows="4" required minlength="10" maxlength="500"
                             placeholder="Précisez la raison de l'annulation..."></textarea>
                         <p class="field-help">Visible par les participants, de 10 à 500 caractères.</p>
