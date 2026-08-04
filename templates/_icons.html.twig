@@ -1,0 +1,24 @@
+{# Icones FontAwesome 6 Free, rendues en SVG inline par symfony/ux-icons #}
+{# Importees en local dans assets/icons : aucune requete sortante au runtime #}
+{# La couche macro est conservee : les appels {{ icon.home() }} des templates ne changent pas #}
+
+{% macro home() %}{{ ux_icon('fa6-solid:house', {class: 'icon', 'aria-hidden': 'true'}) }}{% endmacro %}
+
+{% macro plusCircle() %}{{ ux_icon('fa6-solid:circle-plus', {class: 'icon', 'aria-hidden': 'true'}) }}{% endmacro %}
+
+{% macro magnifier() %}{{ ux_icon('fa6-solid:magnifying-glass', {class: 'icon', 'aria-hidden': 'true'}) }}{% endmacro %}
+
+{% macro user() %}{{ ux_icon('fa6-solid:user', {class: 'icon', 'aria-hidden': 'true'}) }}{% endmacro %}
+
+{% macro arrowLeft() %}{{ ux_icon('fa6-solid:arrow-left', {class: 'icon', 'aria-hidden': 'true'}) }}{% endmacro %}
+
+{% macro burger() %}{{ ux_icon('fa6-solid:bars', {class: 'icon', 'aria-hidden': 'true'}) }}{% endmacro %}
+
+{# Crayon : action Modifier dans la barre haute de la fiche balade #}
+{% macro pencil() %}{{ ux_icon('fa6-solid:pen', {class: 'icon', 'aria-hidden': 'true'}) }}{% endmacro %}
+
+{# Le remplissage est le seul signal d'etat du like : contour si non aime, plein sinon #}
+{% macro heart(filled = false) %}{{ ux_icon(filled ? 'fa6-solid:heart' : 'fa6-regular:heart', {class: 'icon', 'aria-hidden': 'true'}) }}{% endmacro %}
+
+{# Moto : illustration des etats vides, format 64px via .icon-large #}
+{% macro motorcycle() %}{{ ux_icon('fa6-solid:motorcycle', {class: 'icon-large', 'aria-hidden': 'true'}) }}{% endmacro %}

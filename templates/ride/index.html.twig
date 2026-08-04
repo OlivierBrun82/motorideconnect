@@ -1,28 +1,47 @@
 {% extends 'base.html.twig' %}
+{% import '_icons.html.twig' as icon %}
 
-{% block title %}Hello RideController!{% endblock %}
+{% block title %}Balades{% endblock %}
 
 {% block body %}
+    {# Le formulaire porte le nom ride_filter : sa presence signale un filtre applique #}
+    {% set filtersApplied = app.request.query.has('ride_filter') %}
 
-<a href="{{ path('app_ride_new') }}">Créer une balade</a>
+    {# Panneau replie par defaut : six champs ne doivent pas repousser les resultats #}
+    <details class="filters"{% if filtersApplied %} open{% endif %}>
+        <summary>Filtres{% if filtersApplied %} appliqués{% endif %}</summary>
+        <div class="filters-body">
+            {{ form_start(form) }}
+                {{ form_widget(form) }}
+                <button type="submit" class="btn btn-secondary btn-block">Filtrer</button>
+            {{ form_end(form) }}
+            {% if filtersApplied %}
+                <a class="btn btn-quiet btn-block" href="{{ path('app_ride') }}">Réinitialiser</a>
+            {% endif %}
+        </div>
+    </details>
 
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button type="submit">Filtrer</button>
-{{ form_end(form) }}
-<p>{{ pagination.totalItems }} balade{{ pagination.totalItems > 1 ? 's' }} trouvée{{ pagination.totalItems > 1 ? 's' }}</p>
+    <div class="section-head">
+        <h2>Résultats</h2>
+        <span class="mono text-muted">{{ pagination.totalItems }} balade{{ pagination.totalItems > 1 ? 's' }}</span>
+    </div>
 
-{% for ride in pagination.items %}
-    <article>
-        <h2><a href="{{ path('app_ride_show', {id: ride.id}) }}">{{ ride.name }}</a></h2>
-        <p>{{ ride.meetingDatetime|date('d/m/Y H:i') }} — {{ ride.departmentCode }}</p>
-        {% set organizerRideCount = organizerRideCounts[ride.user.id] %}
-        <p>Organisateur : {{ ride.user.pseudo }} ({{ organizerRideCount }} balade{{ organizerRideCount > 1 ? 's' }} organisée{{ organizerRideCount > 1 ? 's' }})</p>
-        <p>Statut : {{ include('ride/_status.html.twig', {ride: ride}) }} — Places restantes : {{ ride.capacity - (ride.participants|length) }}</p>
-        {{ include('ride/_participation.html.twig', {ride: ride}) }}
-    </article>
-{% else %}
-    <p>Aucune balade ne correspond à ta recherche.</p>
-{% endfor %}
-{{ include('ride/_pagination.html.twig', {pagination: pagination}) }}
+    {% if pagination.items is not empty %}
+        {# Une suite de balades est une liste : ce conteneur porte aussi la grille desktop #}
+        <ul class="card-grid">
+            {% for ride in pagination.items %}
+                {# Carte extraite en D7 : le fil de l'accueil affiche la meme, sans la dupliquer #}
+                <li>{{ include('ride/_card.html.twig', {ride: ride}) }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        {# Etat vide compose : illustration, une phrase, un seul CTA (charte section 4) #}
+        <div class="empty-state">
+            {{ icon.motorcycle() }}
+            <p>Aucune balade ne correspond à ta recherche.</p>
+            <a class="btn btn-primary" href="{{ path('app_ride_new') }}">Créer une balade</a>
+        </div>
+    {% endif %}
+
+    {{ include('ride/_pagination.html.twig', {pagination: pagination}) }}
 {% endblock %}

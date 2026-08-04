@@ -1,13 +1,13 @@
 {% if pagination.totalPages > 1 %}
-    <nav>
+    <nav class="pagination" aria-label="Pagination">
         {% if pagination.hasPrevious %}
-            <a href="{{ path('app_ride', app.request.query.all|merge({page: pagination.previousPage})) }}">Précédent</a>
+            <a class="btn btn-secondary" href="{{ path('app_ride', app.request.query.all|merge({page: pagination.previousPage})) }}">Précédent</a>
         {% endif %}
 
-        <span>Page {{ pagination.currentPage }} sur {{ pagination.totalPages }}</span>
+        <span class="mono text-muted">Page {{ pagination.currentPage }} sur {{ pagination.totalPages }}</span>
 
         {% if pagination.hasNext %}
-            <a href="{{ path('app_ride', app.request.query.all|merge({page: pagination.nextPage})) }}">Suivant</a>
+            <a class="btn btn-secondary" href="{{ path('app_ride', app.request.query.all|merge({page: pagination.nextPage})) }}">Suivant</a>
         {% endif %}
     </nav>
 {% endif %}

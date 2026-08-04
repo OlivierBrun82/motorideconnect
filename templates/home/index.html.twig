@@ -1,7 +1,48 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}HOME TITLE{% endblock %}
+{% import '_icons.html.twig' as icon %}
 
 {% block body %}
-    <h1>page d'accueil</h1>
+    {% if app.user %}
+        {# Fil du membre : les 5 prochaines balades, /ride porte la liste complete #}
+        <div class="section-head">
+            <h1>Dernières balades</h1>
+            <a href="{{ path('app_ride') }}">Filtrer</a>
+        </div>
+
+        {% if rides is not empty %}
+            {# Une suite de balades est une liste : ce conteneur porte aussi la grille desktop #}
+            <ul class="card-grid">
+                {% for ride in rides %}
+                    <li>{{ include('ride/_card.html.twig', {ride: ride}) }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            {# Etat vide compose : illustration, une phrase, un seul CTA (charte section 4) #}
+            <div class="empty-state">
+                {{ icon.motorcycle() }}
+                <p>Aucune balade à venir pour le moment.</p>
+                <a class="btn btn-primary" href="{{ path('app_ride_new') }}">Créer une balade</a>
+            </div>
+        {% endif %}
+
+        {% if rides|length > 0 %}
+            <a class="btn btn-secondary btn-block" href="{{ path('app_ride') }}">Voir toutes les balades</a>
+        {% endif %}
+    {% else %}
+        {# Visiteur anonyme : presentation et inscription, aucune balade affichee #}
+        {# Pas de marque ici : la barre haute la porte deja comme titre, elle ferait doublon #}
+        <section class="hero">
+            <h1>Ne roulez plus seul.</h1>
+            <p class="hero-pitch">Organisez vos balades, trouvez celles qui partent près de chez vous, et roulez avec des motards qui partagent votre niveau.</p>
+
+            <a class="btn btn-primary btn-block" href="{{ path('app_register') }}">Créer un compte</a>
+            <a class="btn btn-secondary btn-block" href="{{ path('app_login') }}">J'ai déjà un compte</a>
+        </section>
+
+        <ul class="hero-points">
+            <li>{{ icon.magnifier() }}<span>Cherchez par département, type de balade et niveau de pilotage.</span></li>
+            <li>{{ icon.plusCircle() }}<span>Publiez votre itinéraire et fixez le nombre de places.</span></li>
+            <li>{{ icon.user() }}<span>Retrouvez les organisateurs et le garage de chaque membre.</span></li>
+        </ul>
+    {% endif %}
 {% endblock %}

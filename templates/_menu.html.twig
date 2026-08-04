@@ -1,0 +1,15 @@
+{# Liens secondaires, source unique : rendus dans le tiroir sur mobile, en clair sur grand ecran #}
+<ul>
+    {% if app.user %}
+        <li><a href="{{ path('app_motorcycle') }}">Mon garage</a></li>
+        {% if is_granted('ROLE_ADMIN') %}
+            <li><a href="{{ path('app_admin') }}">Administration</a></li>
+        {% endif %}
+    {% endif %}
+    <li><a href="{{ path('app_legal') }}">Mentions légales</a></li>
+    {% if app.user %}
+        <li><a href="{{ path('app_logout') }}">Déconnexion</a></li>
+    {% else %}
+        <li><a href="{{ path('app_login') }}">Connexion</a></li>
+    {% endif %}
+</ul>

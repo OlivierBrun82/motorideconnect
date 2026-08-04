@@ -47,7 +47,7 @@ class RideFilterType extends AbstractType
                 'placeholder' => 'Toutes les durées',
             ])
             ->add('statut', ChoiceType::class, [
-                'label' => 'Satut',
+                'label' => 'Statut',
                 'choices' => [
                     'Ouverte' => RideStatus::Open,
                     'Complète' => RideStatus::Full,
