@@ -37,7 +37,7 @@ class RideCancellationManager
 
             // un TemplatedEmail neuf a chaque tour, sinon les destinataires s'accumulent
             $email = (new TemplatedEmail())
-                ->from(new Address('no-reply@motoride-connect.fr', 'MotoRide Connect'))
+                ->from(new Address('noreply@motoride-connect.fr', 'MotoRide Connect'))
                 ->to((string) $participant->getEmail())
                 ->subject('La balade ' . $ride->getName() . ' a été annulée')
                 ->htmlTemplate('ride/cancel_email.html.twig')

@@ -44,7 +44,7 @@ class ModerationManager
     private function sendStrikeEmail(User $target, string $reason) : void
     {
         $email = (new TemplatedEmail())
-            ->from(new Address('no-reply@motoride-connect.fr', 'MotoRide Connect'))
+            ->from(new Address('noreply@motoride-connect.fr', 'MotoRide Connect'))
             ->to((string) $target->getEmail())
             ->subject('Tu as reçu un avertissement sur MotoRide Connect')
             ->htmlTemplate('moderation/strike_email.html.twig')
@@ -70,7 +70,7 @@ class ModerationManager
     private function sendBanEmail(User $target) : void
     {
         $email = (new TemplatedEmail())
-            ->from(new Address('no-reply@motoride-connect.fr', 'Motoride-Connect'))
+            ->from(new Address('noreply@motoride-connect.fr', 'Motoride-Connect'))
             ->to((string) $target->getEmail())
             ->subject('Ton compte Motoride Connect a été banni')
             ->htmlTemplate('moderation/ban_email.html.twig');
@@ -92,7 +92,7 @@ class ModerationManager
     private function sendUnbanEmail(User $target) : void
     {
         $email = (new TemplatedEmail())
-            ->from(new Address('no-reply@motoride-connect.fr', 'MotoRide Connect'))
+            ->from(new Address('noreply@motoride-connect.fr', 'MotoRide Connect'))
             ->to((string) $target->getEmail())
             ->subject('Ton compte MotoRide Connect a été réactivé')
             ->htmlTemplate('moderation/unban_email.html.twig');

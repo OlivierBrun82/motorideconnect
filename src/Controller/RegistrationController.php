@@ -70,7 +70,7 @@ class RegistrationController extends AbstractController
             // generate a signed url and email it to the user
             $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
                 (new TemplatedEmail())
-                    ->from(new Address('no-reply@motoride-connect.fr', 'MotoRide Connect'))
+                    ->from(new Address('noreply@motoride-connect.fr', 'MotoRide Connect'))
                     ->to((string) $user->getEmail())
                     ->subject('Confirme ton inscription sur MotoRide Connect')
                     ->htmlTemplate('registration/confirmation_email.html.twig')
