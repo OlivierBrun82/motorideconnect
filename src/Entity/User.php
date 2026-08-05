@@ -54,7 +54,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         maxMessage: 'Le pseudo ne peut pas dépasser {{ limit }} caractères',
     )]
     #[Assert\Regex(
-        pattern: '/^[a-zA-Z0-9_-]+$/',
+        // Tiret echappe : les navigateurs compilent l'attribut pattern en mode
+        // strict, ou un tiret non echappe dans une classe est refuse
+        pattern: '/^[a-zA-Z0-9_\-]+$/',
         message: 'Le pseudo ne peut contenir que des lettres, chiffres, - et _',
     )]
     #[ORM\Column(length: 100, unique: true)]
