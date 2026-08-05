@@ -35,6 +35,12 @@ class FileUploader
         // Dossier de destination (ex. public/uploads/motorcycles)
         $destination = $this->uploadsDir . '/' . $subDirectory;
 
+        // Git ne versionne pas les dossiers vides : ils peuvent manquer sur un
+        // clone neuf ou dans un volume Docker fraichement cree
+        if (!is_dir($destination) && !mkdir($destination, 0775, true) && !is_dir($destination)) {
+            throw new FileException("Impossible de creer le dossier : $destination");
+        }
+
         // Traite l'image (resize + WebP + suppression de l'EXIF) et l'écrit à destination
         $this->processImage($file->getPathname(), $destination . '/' . $newFilename);
 
