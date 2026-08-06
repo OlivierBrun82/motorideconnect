@@ -3,6 +3,10 @@
 
 {% block title %}{{ ride.name }}{% endblock %}
 
+{# Balade partagee sur Discord : l'apercu porte son nom et son rendez-vous #}
+{% block ogType %}article{% endblock %}
+{% block ogDescription %}{{ ride.meetingPlace }}{% if ride.endPoint %} → {{ ride.endPoint }}{% endif %}, le {{ ride.meetingDatetime|date('d/m/Y à H\\hi') }}. {{ ride.descriptionMessage|default('')|slice(0, 160) }}{% endblock %}
+
 {% block header %}
     {{ include('_header.html.twig', {
         title: ride.name,

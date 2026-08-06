@@ -11,6 +11,8 @@
     --color-steel: #6B7280;
     --color-accent: #475569;
     --color-hairline: rgba(28, 28, 30, 0.08);
+    /* Encre eclaircie : sert au seul survol du bouton primaire, pas une teinte de plus */
+    --color-ink-hover: #35353A;
 
     /* Familles : Space Grotesk titres, Outfit texte, JetBrains Mono chiffres */
     --font-display: 'Space Grotesk', sans-serif;
@@ -200,8 +202,10 @@ hr {
 }
 
 /* La marque ne sert qu'au grand ecran : sur mobile le centre revient au titre de page */
+/* C'est un lien vers l'accueil, mais souligne il ferait tache dans la barre */
 .topbar-brand {
     display: none;
+    text-decoration: none;
 }
 
 .topbar-avatar {
@@ -1106,6 +1110,11 @@ a.card-organizer:hover {
     text-align: center;
 }
 
+/* Meme parti pris que dans la barre haute : la marque cliquable reste nue */
+.auth-brand a {
+    text-decoration: none;
+}
+
 .auth h1 {
     text-align: center;
 }
@@ -1319,6 +1328,12 @@ a.card-organizer:hover {
         max-width: 680px;
     }
 
+    /* Page de saisie : c'est la colonne entiere qui retrecit, titre compris */
+    /* Le formulaire remplit alors la colonne, la regle du dessus ne le bride plus */
+    .page-narrow {
+        max-width: 680px;
+    }
+
     /* L'ecran de connexion n'a pas de h1 aligne a gauche : son bloc se centre */
     .auth {
         max-width: 680px;
@@ -1340,6 +1355,36 @@ a.card-organizer:hover {
     .card-grid .card {
         flex: 1;
         margin-bottom: 0;
+    }
+}
+
+/* == SURVOL ================================================================ */
+/* Reserve aux pointeurs : sur un ecran tactile le survol resterait colle apres le tap */
+/* Uniquement ce qui est cliquable : la carte est un article, pas un lien */
+@media (hover: hover) {
+    .btn-primary:hover {
+        background-color: var(--color-ink-hover);
+    }
+
+    .btn-secondary:hover {
+        background-color: var(--color-canvas);
+    }
+
+    /* Pastille discrete sous l'icone, la barre haute reste sans aplat */
+    .topbar-action:hover {
+        background-color: var(--color-hairline);
+        border-radius: var(--radius-control);
+    }
+
+    /* L'onglet passe de l'acier a l'encre, sauf l'actif qui garderait son accent */
+    .tabbar-item:not(.is-active):hover {
+        color: var(--color-ink);
+    }
+
+    /* La marque ne prend pas le souligne des liens de texte */
+    .topbar-brand:hover,
+    .auth-brand a:hover {
+        color: var(--color-steel);
     }
 }
 
