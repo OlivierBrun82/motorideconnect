@@ -21,7 +21,8 @@
     <span class="topbar-title">{{ title }}</span>
 
     {# Sur grand ecran ce coin porte la marque, le titre de page etant deja dans le h1 #}
-    <span class="topbar-title topbar-brand">MotoRide-Connect</span>
+    {# La marque ramene a l'accueil, comme sur la plupart des sites #}
+    <a class="topbar-title topbar-brand" href="{{ path('app_home') }}">MotoRide-Connect</a>
 
     {% if not back and app.user %}
         <a href="{{ path('app_profile') }}" class="topbar-action" aria-label="Mon profil">

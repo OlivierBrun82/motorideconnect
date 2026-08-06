@@ -6,6 +6,22 @@
         <title>{% block title %}Accueil{% endblock %} — MotoRide-Connect</title>
         <meta name="description" content="{% block metaDescription %}Organisez et rejoignez des balades moto entre passionnés.{% endblock %}">
         <link rel="icon" href="{{ asset('images/favicon.svg') }}">
+        <meta name="theme-color" content="#1C1C1E">
+
+        {# Apercu des liens partages (Discord, Facebook, LinkedIn, Signal) #}
+        {# Ces reseaux ne lisent ni le title ni la meta description : il leur faut og #}
+        <meta property="og:site_name" content="MotoRide-Connect">
+        <meta property="og:locale" content="fr_FR">
+        <meta property="og:type" content="{% block ogType %}website{% endblock %}">
+        <meta property="og:title" content="{% block ogTitle %}{{ block('title') }}{% endblock %} — MotoRide-Connect">
+        <meta property="og:description" content="{% block ogDescription %}{{ block('metaDescription') }}{% endblock %}">
+        <meta property="og:url" content="{{ app.request.uri }}">
+        {# URL absolue obligatoire : une URL relative n'est pas suivie par les robots #}
+        <meta property="og:image" content="{{ absolute_url(asset('images/og.png')) }}">
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
+        <meta property="og:image:alt" content="Logo MotoRide-Connect">
+        <meta name="twitter:card" content="summary_large_image">
 
         {% block stylesheets %}
         {% endblock %}
@@ -27,7 +43,8 @@
             </nav>
         </div>
 
-        <main class="page">
+        {# Les pages de saisie ajoutent page-narrow : colonne etroite et centree #}
+        <main class="page{% block pageModifier %}{% endblock %}">
             <div data-turbo-temporary>
                 {% for label, messages in app.flashes %}
                     {% for message in messages %}
