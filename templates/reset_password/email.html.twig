@@ -1,0 +1,15 @@
+<h1>Salut !</h1>
+
+<p>
+    Tu as demandé à réinitialiser ton mot de passe sur Motoride-Connect. Suis ce lien pour en choisir un nouveau : <br><br>
+    <a href="{{ url('app_reset_password', {token: resetToken.token}) }}">Réinitialiser mon mot de passe</a>.
+    Ce lien expirera dans {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.
+</p>
+
+<p>
+    Si tu n'es pas à l'origine de cette demande, ignore simplement cet email : ton mot de passe ne changera pas.
+</p>
+
+<p>
+    À bientôt sur les routes !
+</p>
