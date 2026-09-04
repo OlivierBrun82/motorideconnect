@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau mot de passe{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block body %}
+    <div class="auth">
+        <p class="auth-brand"><a href="{{ path('app_home') }}">MotoRide-Connect</a></p>
+
+        <h1>Choisis un nouveau mot de passe</h1>
+
+        {{ form_start(resetForm) }}
+            {{ form_row(resetForm.plainPassword.first) }}
+            {{ form_row(resetForm.plainPassword.second) }}
+
+            <button class="btn btn-primary btn-block" type="submit">
+                Réinitialiser le mot de passe
+            </button>
+        {{ form_end(resetForm) }}
+    </div>
+{% endblock %}

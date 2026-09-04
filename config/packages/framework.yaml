@@ -11,6 +11,10 @@ framework:
             policy: 'fixed_window'
             limit: 3
             interval: '1 hour'
+        password_reset:
+            policy: 'fixed_window'
+            limit: 3
+            interval: '1 hour'
 
     #esi: true
     #fragments: true

@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Email envoyé{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block body %}
+    <div class="auth">
+        <p class="auth-brand"><a href="{{ path('app_home') }}">MotoRide-Connect</a></p>
+
+        <h1>Vérifie tes emails</h1>
+
+        <p>
+            Si un compte existe avec cette adresse, un email vient d'être envoyé avec un lien pour réinitialiser ton mot de passe.
+            Ce lien expirera dans {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.
+        </p>
+        <p class="text-muted">
+            Rien reçu ? Vérifie tes spams ou <a href="{{ path('app_forgot_password_request') }}">réessaie</a>.
+        </p>
+
+        <p class="auth-foot">
+            <a href="{{ path('app_login') }}">Retour à la connexion</a>
+        </p>
+    </div>
+{% endblock %}
